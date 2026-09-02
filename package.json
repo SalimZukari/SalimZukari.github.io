@@ -1,0 +1,12 @@
+{
+  "name": "marvel-network-explorer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive Marvel Wikipedia social network explorer — Social Graphs / Network Science, Week 1.",
+  "scripts": {
+    "analyze": "python scripts/analyze.py",
+    "start": "npx --yes http-server . -p 8080 -c-1",
+    "serve": "npm run start"
+  },
+  "license": "MIT"
+}
