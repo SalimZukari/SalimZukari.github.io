@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Week 3: Who Holds the Marvel Universe Together? — Social Graphs Group Site</title>
+  <meta name="description" content="Real brokers vs. raw popularity on the Marvel Wikipedia network, a network-breaking removal experiment, and an interactive six-degrees-of-Spider-Man tool." />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../src/css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="site-nav" aria-label="Section navigation">
+    <div class="container">
+      <a href="#top" class="brand">MARVEL<span class="dot">•</span>NETWORK</a>
+      <button class="btn btn-ghost nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links">☰ Menu</button>
+      <div class="nav-links" id="nav-links">
+        <a href="#hook">Hook</a>
+        <a href="#brokers">Real Brokers</a>
+        <a href="#removal">Break the Universe</a>
+        <a href="#sixdegrees">Six Degrees</a>
+        <a href="#cliques">Cliques</a>
+        <a href="#llm">Grading an LLM</a>
+        <a href="#conclusions">Conclusions</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div id="load-status" class="container"></div>
+
+    <div id="app" hidden>
+      <div class="container" style="padding-top:50px" id="top">
+        <span class="section-kicker">Week 3 · Who Matters, and Why</span>
+        <h1 class="section-title" style="font-size:clamp(2rem,5vw,3rem)">Who holds the Marvel universe together?</h1>
+        <div class="post-meta">
+          <span class="badge">Exercise 3.12 — Go nuts with your LLM</span>
+          <a class="badge" href="https://sunelehmann.com/socialgraphs2026-web/weeks/week3.html" target="_blank" rel="noopener">Course page ↗</a>
+          <a class="badge" href="week3/week3_gonuts.ipynb">Notebook ↗</a>
+          <a class="badge" href="week3/week3_gonuts.md">Write-up ↗</a>
+        </div>
+        <p class="section-lede">
+          Spider-Man tops every centrality measure on this network. That's not a finding — it's what 106 links
+          looks like. This post is about who is more (or less) central than raw popularity predicts, what breaks
+          when you start removing characters, and how far everyone really is from Spider-Man.
+        </p>
+
+        <div class="story-grid" style="margin-bottom:10px">
+          <div class="story-card"><h3>What we asked</h3><p id="wk3-asked"></p></div>
+          <div class="story-card"><h3>What we did</h3><p id="wk3-did"></p></div>
+          <div class="story-card"><h3>What we found</h3><p id="wk3-found"></p></div>
+          <div class="story-card"><h3>What surprised us</h3><p id="wk3-surprised"></p></div>
+        </div>
+      </div>
+
+      <!-- HOOK -->
+      <section id="hook">
+        <div class="container">
+          <span class="section-kicker">The Hook</span>
+          <h2 class="section-title">Spider-Man is exactly as central as his 106 links predict</h2>
+          <p class="section-lede">
+            All numbers below are on the <strong>undirected giant component</strong> (277 characters, 1,421 links)
+            unless stated otherwise, and every z-score is against 200 degree-preserving shuffles of that same
+            component. Degree answers "how popular"; betweenness answers "how much does information flow through
+            you"; closeness answers "how quickly do you reach everyone."
+          </p>
+          <div class="stat-grid" id="hook-cards"></div>
+          <p class="section-lede" style="margin-top:20px">
+            Both z-scores sit within about one standard deviation of the null: a character with 106 links looks
+            exactly like this in <em>any</em> network with this degree sequence, real or shuffled. Spider-Man isn't
+            an unusually well-positioned bridge — he's just enormous, and enormous nodes behave predictably.
+          </p>
+        </div>
+      </section>
+
+      <!-- REAL BROKERS -->
+      <section id="brokers">
+        <div class="container">
+          <span class="section-kicker">The Real Brokers</span>
+          <h2 class="section-title">Who's more (or less) of a bridge than their degree predicts?</h2>
+          <p class="section-lede">
+            Betweenness z-score (200 degree-preserving shuffles) plotted against degree, undirected giant
+            component. Points above zero are bigger bridges than their degree alone predicts; points below are
+            well-connected but not brokers.
+          </p>
+          <div class="chart-wrap">
+            <div id="brokers-chart" role="img" aria-label="Scatter plot of betweenness z-score against degree for every character in the giant component, with the biggest positive and negative outliers labeled."></div>
+          </div>
+          <div id="brokers-table" style="margin-top:18px"></div>
+          <p class="section-lede" style="margin-top:20px">
+            <strong>Hercules and Black Widow</strong> connect the core Avengers/Hulk/Wolverine hub cluster to
+            low-degree peripheries the hub core doesn't touch directly — Hercules to a scattering of
+            cosmic/Asgardian characters, Black Widow to a Spider-Man-adjacent street-level fringe. <strong>Rockman</strong>
+            is the single most surprising node in the whole component: degree 2, but one of his two neighbors
+            (The Witness) has no other route into the giant component at all, so every shortest path through that
+            dead end runs through Rockman. <strong>Black Cat</strong> is the mirror image: more links than either
+            broker, but her connections stay inside one already-dense neighborhood — well-connected, not a broker.
+          </p>
+          <details class="chart-summary">
+            <summary>Why is closeness harder to be surprising at?</summary>
+            <div class="explainer-body">
+              Closeness is a sum over every other node's distance, so it self-averages — one unusual edge only
+              nudges a small fraction of those terms. Betweenness is a sum over specific shortest paths, so one
+              structurally load-bearing edge (like Rockman's dead-end neighbor) can dominate it completely. Neither
+              Hercules nor Black Widow show up near either end of the closeness ranking.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- BREAK THE UNIVERSE -->
+      <section id="removal">
+        <div class="container">
+          <span class="section-kicker">Break the Universe</span>
+          <h2 class="section-title">Which removal fragments the network the most?</h2>
+          <p class="section-lede">
+            Giant-component fraction vs. characters removed, five orders. Click a legend chip to show or hide a
+            line. "Betweenness (dynamic)" recomputes betweenness after every single removal; every other order is
+            fixed at the start.
+          </p>
+          <div class="chart-wrap">
+            <div id="removal-chart" role="img" aria-label="Line chart of giant component fraction versus number of characters removed, for five different removal orders: degree, static betweenness, dynamic betweenness, PageRank, and averaged random order."></div>
+          </div>
+          <p class="chart-caption" id="removal-summary" style="margin-top:14px"></p>
+          <p class="section-lede" style="margin-top:16px">
+            Removing any <em>one</em> character barely dents a 277-node component — even Spider-Man only knocks it
+            down 2%. Real fragmentation is a multi-removal story, and the <em>order</em> matters: recomputing
+            betweenness after every removal beats every fixed-order strategy, including PageRank, and every
+            targeted order fragments the network far faster than random removal — robust to random loss, fragile
+            to targeted attack.
+          </p>
+        </div>
+      </section>
+
+      <!-- SIX DEGREES -->
+      <section id="sixdegrees">
+        <div class="container">
+          <span class="section-kicker">Six Degrees of Spider-Man</span>
+          <h2 class="section-title">How far is everyone, really?</h2>
+          <p class="section-lede">
+            Spider-Man is the giant component's center (radius 3) — so by definition, nobody in his own component
+            is more than 3 hops from him. Type a character below, or toggle "follow arrows" to search along
+            directed Wikipedia links instead (does the character's own article eventually link its way to
+            Spider-Man's?).
+          </p>
+          <div class="sixdeg-widget">
+            <div class="sixdeg-controls">
+              <div class="sixdeg-search network-search">
+                <input type="text" id="sixdeg-input" placeholder="Search a character…" aria-label="Search for a character" autocomplete="off" />
+                <div class="search-suggestions" id="sixdeg-suggestions" hidden></div>
+              </div>
+              <label class="sixdeg-toggle"><input type="checkbox" id="sixdeg-arrows" /> Follow arrows (directed)</label>
+            </div>
+            <div class="sixdeg-chain" id="sixdeg-chain" aria-live="polite"></div>
+            <p class="sixdeg-result-meta" id="sixdeg-meta"></p>
+          </div>
+          <p class="section-lede" style="margin-top:20px">
+            Direction flips the story: Spider-Man's own article links out to only 9 other characters, so following
+            arrows <em>outward from him</em> reaches a small, specific slice of the network — nowhere near
+            everyone. Flip it around and ask who has <em>any</em> directed chain leading into him, and the vast
+            majority do, since so many articles link to him somewhere along the way even when he never links back.
+          </p>
+          <details class="chart-summary">
+            <summary>Validating the browser BFS</summary>
+            <div class="explainer-body">
+              This widget's search uses the same plain BFS algorithm validated against
+              <code>networkx.shortest_path_length</code> on 20 sampled pairs in the notebook (undirected mode) —
+              see <a href="week3/week3_gonuts.ipynb">week3_gonuts.ipynb</a>, section 8.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- CLIQUES + HOMOPHILY -->
+      <section id="cliques">
+        <div class="container">
+          <span class="section-kicker">Cliques &amp; Team Homophily</span>
+          <h2 class="section-title">The biggest cliques, named — are they all teams?</h2>
+          <p class="chart-caption" id="cliques-summary" style="margin-bottom:14px"></p>
+          <div class="clique-list" id="cliques-list"></div>
+          <p class="section-lede" style="margin-top:20px">
+            Every maximal 8-clique here shares the same five-character X-Men core, with a few more X-Men-adjacent
+            teammates rotating through the remaining seats — yes, they're all teams. That's suggestive but not
+            proof of homophily by itself (cliques could just be a byproduct of degree), so we tested directly
+            against Wikidata team labels.
+          </p>
+          <p class="chart-caption" id="homophily-summary" style="margin:16px 0 10px"></p>
+          <div class="clique-list" id="homophily-teams" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          <details class="chart-summary" style="margin-top:16px">
+            <summary>Why a label-shuffle null, not the usual edge shuffle?</summary>
+            <div class="explainer-body">
+              Degree assortativity asks "is this surprising given the degree sequence" — the right question when
+              degree is a known driver. Team membership isn't a structural graph property at all; it's metadata
+              draped over fixed nodes. The right null re-deals the <em>labels</em> across the same nodes and leaves
+              every edge untouched, isolating exactly the question being asked.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- LLM GRADING -->
+      <section id="llm">
+        <div class="container">
+          <span class="section-kicker">Grading an LLM</span>
+          <h2 class="section-title">What an LLM got wrong about who matters</h2>
+          <p class="section-lede">We asked an LLM to write a short paragraph about who matters most in this network, then checked every claim.</p>
+          <p class="llm-paragraph" id="llm-paragraph"></p>
+          <div id="llm-claims"></div>
+        </div>
+      </section>
+
+      <!-- CONCLUSIONS -->
+      <section id="conclusions">
+        <div class="container">
+          <span class="section-kicker">What We Can and Can't Conclude</span>
+          <h2 class="section-title">Limits, and the bottom line</h2>
+          <p class="section-lede">
+            This is a Wikipedia hyperlink graph, not a social network — every centrality here measures
+            editorial/narrative prominence, not in-universe importance. The degree-preserving shuffle tests whether
+            a result needs more than the degree sequence to appear; it does not rule out every other explanation. A
+            z-score of +4 for Hercules means "not explained by degree alone," not "definitely explained by his
+            crossover history" — though that's the best reading we have from his neighbor list. Team homophily's
+            z ≈ 17.5 is tested against a completely different null (label-shuffle, not edge-shuffle) and shouldn't be
+            read on the same scale as the degree-assortativity z. The removal experiment operates on a static
+            snapshot and says nothing about how the network might be rewired after a real disruption.
+          </p>
+          <p class="section-lede">
+            <strong>Conclusion.</strong> Spider-Man is exactly as central as his 106 links predict — a sanity
+            check, not a finding. The real brokers are Hercules and Black Widow, and far more extremely, Rockman.
+            Fragmenting the network seriously is a multi-removal story where the order matters — dynamically
+            recomputed betweenness beats every other strategy tried here. And despite the "six degrees" framing,
+            everybody in Spider-Man's own giant component is at most three hops from him, as long as you don't
+            insist the links go the right way.
+          </p>
+          <p class="section-lede">
+            Full exercise: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week3.html#3.12" target="_blank" rel="noopener">exercise 3.12 on the course page</a>.
+          </p>
+          <p class="chart-caption" id="wk3-meta"></p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Built for the <strong>Social Graphs / Network Science</strong> course — Week 3 group exercise.</p>
+      <p>
+        Course exercise: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week3.html" target="_blank" rel="noopener">Week 3 page</a> ·
+        Notebook: <a href="week3/week3_gonuts.ipynb">week3_gonuts.ipynb</a>
+      </p>
+      <p>No official Marvel artwork, logos, or trademarks are used on this site. All visual design is original.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script type="module" src="../src/js/week3.js"></script>
+  <script type="module">
+    import { initWeekNav } from "../src/js/weeknav.js";
+
+    const toggle = document.getElementById("nav-toggle");
+    const links = document.getElementById("nav-links");
+    toggle.addEventListener("click", () => {
+      const open = links.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+    links.querySelectorAll("a").forEach((a) =>
+      a.addEventListener("click", () => {
+        links.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      })
+    );
+
+    initWeekNav(3);
+  </script>
+</body>
+</html>

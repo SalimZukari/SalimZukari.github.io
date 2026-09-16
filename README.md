@@ -53,7 +53,9 @@ from that notebook's output, in the same style as a blog post.
 **Week 3 — `scripts/week3_analyze.py` → `data/processed/week3.json`.** Centralities
 (degree, closeness, harmonic, betweenness, PageRank) against a 200-run degree-preserving
 shuffle null, targeted-removal robustness curves, degree assortativity, team homophily,
-and the adjacency used by the in-browser six-degrees-of-Spider-Man widget. See
+and the adjacency used by the in-browser six-degrees-of-Spider-Man widget. Team labels come
+from the Wikidata API (property P463, "member of"); the first run fetches and caches them to
+`data/raw/week3_wikidata_team_cache.json`, so later runs are offline and reproducible. See
 `weeks/week3/week3_gonuts.ipynb` for the exploration and validation cells.
 
 ## Running locally

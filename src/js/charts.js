@@ -234,6 +234,141 @@ export function renderComponentBars(container, components) {
     .style("width", (d) => `${Math.max(2, (d.size / maxSize) * 100)}%`);
 }
 
+/**
+ * Week 3: z-score (betweenness or closeness) vs. degree, log-x scatter,
+ * with a handful of nodes labeled and a y=0 reference line.
+ * @param {HTMLElement} container
+ * @param {Array<{id:string,name:string,degree:number,z:number}>} points
+ * @param {{ label: string, labelIds?: string[], onClick?: Function }} opts
+ */
+export function renderZScoreScatter(container, points, opts = {}) {
+  clear(container);
+  if (!points.length) return;
+  const margin = { top: 20, right: 24, bottom: 46, left: 54 };
+  const { svg, width, height } = responsiveSvg(container, 380);
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const maxDeg = d3.max(points, (d) => d.degree) || 1;
+  const zExtent = d3.extent(points, (d) => d.z);
+  const zPad = Math.max(0.5, (zExtent[1] - zExtent[0]) * 0.08);
+
+  const x = d3.scaleLog().domain([1, maxDeg]).range([0, innerW]);
+  const y = d3.scaleLinear().domain([zExtent[0] - zPad, zExtent[1] + zPad]).range([innerH, 0]);
+
+  g.append("g").attr("class", "axis").attr("transform", `translate(0,${innerH})`).call(d3.axisBottom(x).ticks(6, "~s"));
+  g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(6));
+
+  g.append("text")
+    .attr("x", innerW / 2).attr("y", innerH + 38).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text("degree (log scale)");
+  g.append("text")
+    .attr("transform", "rotate(-90)").attr("x", -innerH / 2).attr("y", -40).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text(`${opts.label || "z"}-score`);
+
+  g.append("line")
+    .attr("x1", 0).attr("x2", innerW).attr("y1", y(0)).attr("y2", y(0))
+    .attr("stroke", "var(--text-faint)").attr("stroke-dasharray", "4 4");
+
+  const labelSet = new Set(opts.labelIds || []);
+
+  g.selectAll("circle.zdot")
+    .data(points)
+    .join("circle")
+    .attr("class", "zdot scatter-dot")
+    .attr("cx", (d) => x(Math.max(d.degree, 1)))
+    .attr("cy", (d) => y(d.z))
+    .attr("r", (d) => (labelSet.has(d.id) ? 6 : 4))
+    .attr("fill", (d) => (d.z >= 0 ? "var(--accent-2)" : "var(--accent)"))
+    .attr("tabindex", "0")
+    .attr("aria-label", (d) => `${d.name}: degree ${d.degree}, z=${d.z.toFixed(2)}`)
+    .on("mouseenter focus", function (event, d) {
+      showTip(`<strong>${d.name}</strong><br>degree ${d.degree}<br>z = ${d.z.toFixed(2)}`, event);
+    })
+    .on("mousemove", (event) => showTip(tooltip().innerHTML, event))
+    .on("mouseleave blur", () => hideTip())
+    .on("click", (event, d) => opts.onClick && opts.onClick(d));
+
+  g.selectAll("text.zlabel")
+    .data(points.filter((d) => labelSet.has(d.id)))
+    .join("text")
+    .attr("class", "zlabel")
+    .attr("x", (d) => x(Math.max(d.degree, 1)) + 7)
+    .attr("y", (d) => y(d.z) - 7)
+    .attr("fill", "var(--text-dim)")
+    .style("font-size", "0.7rem")
+    .text((d) => d.name);
+}
+
+/**
+ * Week 3: giant-component-fraction-vs-removed line chart with a toggleable
+ * legend (click a series name to show/hide it).
+ * @param {HTMLElement} container
+ * @param {Array<{key:string,label:string,color:string,points:Array<{removed:number,giantFraction:number}>}>} series
+ */
+export function renderRemovalChart(container, series) {
+  clear(container);
+  const margin = { top: 20, right: 20, bottom: 46, left: 54 };
+  const { svg, width, height } = responsiveSvg(container, 420);
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const maxRemoved = d3.max(series, (s) => d3.max(s.points, (p) => p.removed));
+  const x = d3.scaleLinear().domain([0, maxRemoved]).range([0, innerW]);
+  const y = d3.scaleLinear().domain([0, 1]).range([innerH, 0]);
+
+  g.append("g").attr("class", "axis").attr("transform", `translate(0,${innerH})`).call(d3.axisBottom(x).ticks(8));
+  g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(6, "%"));
+
+  g.append("text")
+    .attr("x", innerW / 2).attr("y", innerH + 38).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text("characters removed");
+  g.append("text")
+    .attr("transform", "rotate(-90)").attr("x", -innerH / 2).attr("y", -40).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text("giant component fraction");
+
+  const line = d3.line().x((p) => x(p.removed)).y((p) => y(p.giantFraction));
+
+  const paths = g
+    .selectAll("path.removal-line")
+    .data(series, (s) => s.key)
+    .join("path")
+    .attr("class", "removal-line")
+    .attr("fill", "none")
+    .attr("stroke", (s) => s.color)
+    .attr("stroke-width", 2.2)
+    .attr("d", (s) => line(s.points))
+    .on("mouseenter focus", function (event, s) {
+      showTip(`<strong>${s.label}</strong>`, event);
+    })
+    .on("mousemove", (event) => showTip(tooltip().innerHTML, event))
+    .on("mouseleave blur", () => hideTip());
+
+  const legend = d3.select(container.parentElement).select(".removal-legend").empty()
+    ? d3.select(container.parentElement).append("div").attr("class", "removal-legend")
+    : d3.select(container.parentElement).select(".removal-legend");
+  legend.selectAll("*").remove();
+  legend
+    .selectAll("button.removal-legend-item")
+    .data(series, (s) => s.key)
+    .join("button")
+    .attr("class", "removal-legend-item")
+    .attr("type", "button")
+    .style("--legend-color", (s) => s.color)
+    .html((s) => `<span class="removal-legend-swatch"></span>${s.label}`)
+    .on("click", function (event, s) {
+      s.hidden = !s.hidden;
+      d3.select(this).classed("is-hidden", s.hidden);
+      paths.filter((d) => d.key === s.key).attr("display", s.hidden ? "none" : null);
+    });
+}
+
 export function renderDensityGrid(container, density, totalCells = 100) {
   clear(container);
   const filled = Math.max(1, Math.round(density * totalCells));

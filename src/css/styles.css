@@ -949,3 +949,101 @@ a.week-card:hover, a.week-card:focus-visible {
   margin-bottom: 26px;
 }
 .post-meta .badge { font-size: 0.75rem; }
+
+/* ---------- Week 3: removal chart legend ---------- */
+.removal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.removal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  color: var(--text);
+}
+.removal-legend-item.is-hidden { opacity: 0.4; }
+.removal-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--legend-color, var(--accent-2));
+  display: inline-block;
+}
+
+/* ---------- Week 3: six-degrees widget ---------- */
+.sixdeg-widget {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.sixdeg-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.sixdeg-search { position: relative; flex: 1; min-width: 220px; }
+.sixdeg-search input {
+  width: 100%;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.sixdeg-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-dim); }
+.sixdeg-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.sixdeg-step {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: var(--text);
+  text-decoration: none;
+}
+.sixdeg-step:hover { border-color: var(--accent-2); color: var(--accent-2); }
+.sixdeg-arrow { color: var(--text-faint); }
+.sixdeg-unreachable {
+  color: var(--accent);
+  font-weight: 700;
+}
+.sixdeg-result-meta { color: var(--text-faint); font-size: 0.82rem; margin-top: 10px; }
+
+/* ---------- Week 3: broker/team tables and cards ---------- */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.data-table th, .data-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table th { color: var(--text-faint); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.data-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.clique-list { display: grid; gap: 10px; }
+.clique-chip-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.clique-chip { background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; }
+
+.llm-paragraph {
+  font-style: italic;
+  color: var(--text-dim);
+  border-left: 3px solid var(--accent-3);
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin: 16px 0 22px;
+}
+.llm-claim { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 12px; }
+.llm-claim .verdict { color: var(--accent); font-weight: 800; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.llm-claim .verdict.ok { color: var(--ok); }
