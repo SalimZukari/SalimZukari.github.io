@@ -3,440 +3,83 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Marvel Network: Behind the Connections</title>
-  <meta name="description" content="An interactive exploration of the Marvel Wikipedia character network — degree distributions, components, articulation points, and more, built for a Social Graphs / Network Science course." />
+  <title>Social Graphs &amp; Interactions — Group Site</title>
+  <meta name="description" content="Our group's weekly posts for the Social Graphs and Interactions course: interactive data stories built on the shared Marvel Wikipedia character network." />
   <link rel="icon" href="data:," />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="src/css/styles.css" />
+  <script>
+    // Old Week 1 URLs were shared before the site restructure — a hash that
+    // used to belong to the Week 1 page (which was index.html) should still
+    // land on the right section instead of a blank hub page.
+    (function () {
+      var WEEK1_HASHES = new Set([
+        "glance", "mvps", "distribution", "inout", "network", "islands",
+        "experiments", "density", "aha", "exercise", "story", "methodology",
+        "dataset",
+      ]);
+      var hash = window.location.hash.replace(/^#/, "");
+      if (WEEK1_HASHES.has(hash)) {
+        window.location.replace("weeks/week1.html#" + hash);
+      }
+    })();
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <nav class="site-nav" aria-label="Section navigation">
+  <nav class="site-nav" aria-label="Site navigation">
     <div class="container">
-      <a href="#hero" class="brand">MARVEL<span class="dot">•</span>NETWORK</a>
-      <button class="btn btn-ghost nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links">☰ Menu</button>
-      <div class="nav-links" id="nav-links">
-        <a href="#glance">Glance</a>
-        <a href="#mvps">MVPs</a>
-        <a href="#distribution">Distribution</a>
-        <a href="#inout">In/Out</a>
-        <a href="#network">Network</a>
-        <a href="#islands">Islands</a>
-        <a href="#experiments">Experiments</a>
-        <a href="#density">Density</a>
-        <a href="#aha">Aha!</a>
-        <a href="#exercise">Course Exercise</a>
-        <a href="#story">Our Story</a>
-        <a href="#dataset">Dataset</a>
-      </div>
+      <a href="#main" class="brand">SOCIAL GRAPHS<span class="dot">•</span>GROUP SITE</a>
     </div>
   </nav>
 
   <main id="main">
-    <div id="load-status" class="container"></div>
+    <section class="hub-hero">
+      <div class="container">
+        <span class="section-kicker">Social Graphs &amp; Interactions · DTU 02805</span>
+        <h1>Our group's course site</h1>
+        <p class="hub-intro">
+          We're a group in <a href="https://sunelehmann.com/socialgraphs2026-web/index.html" target="_blank" rel="noopener">Social Graphs and Interactions</a>,
+          a network-science course. Every week we take the toolkit from that week's lecture and turn it loose on a
+          shared dataset — mostly the Marvel Wikipedia character network — then publish whatever we find here. Pick a
+          week below to read the post, poke at the interactive bits, and check our numbers against the course page.
+        </p>
+      </div>
+    </section>
 
-    <div id="app" hidden>
-      <!-- 1. HERO -->
-      <section id="hero" class="hero">
-        <canvas class="hero-network-bg" aria-hidden="true"></canvas>
-        <div class="hero-content container">
-          <p class="hero-eyebrow">Social Graphs &amp; Network Science · Week 1</p>
-          <h1>MARVEL NETWORK EXPLORER</h1>
-          <p class="hero-subtitle">
-            303 characters. Hundreds of Wikipedia connections.<br />
-            What happens when we turn Marvel's encyclopedia into a network?
-          </p>
-          <div class="hero-stats" id="hero-stats" aria-live="polite">
-            <div class="hero-stat"><span class="value" data-hero="nodes">–</span><span class="label">Characters</span></div>
-            <div class="hero-stat"><span class="value" data-hero="edges">–</span><span class="label">Directed links</span></div>
-            <div class="hero-stat"><span class="value" data-hero="avgDegree">–</span><span class="label">Avg. degree</span></div>
-            <div class="hero-stat"><span class="value" data-hero="density">–</span><span class="label">Density</span></div>
-          </div>
-          <a href="#glance" class="btn btn-primary">Explore the network ↓</a>
-        </div>
-      </section>
-
-      <!-- 2. THE NETWORK AT A GLANCE -->
-      <section id="glance">
-        <div class="container">
-          <span class="section-kicker">The Network at a Glance</span>
-          <h2 class="section-title">303 characters. But how evenly connected are they?</h2>
-          <p class="section-lede">
-            Every number below is calculated live from the frozen Week 1 dataset — nothing here is hard-coded.
-            These are the headline statistics of the Marvel Wikipedia character network.
-          </p>
-          <div class="stat-grid" id="dashboard-cards"></div>
-          <details class="explainer">
-            <summary>How is this calculated?</summary>
-            <div class="explainer-body">
-              <p><strong>Average degree.</strong> Every undirected edge contributes 2 to the total degree because it touches two nodes. So <code>average degree = 2 × edges / nodes</code>.</p>
-              <p><strong>Density.</strong> Density tells us how many of the possible connections actually exist: <code>density = actual edges / possible edges</code>, where the number of possible undirected edges between <code>n</code> nodes is <code>n(n−1)/2</code>.</p>
-            </div>
-          </details>
-        </div>
-      </section>
-
-      <!-- 3. MEET THE SUPER-CONNECTORS -->
-      <section id="mvps">
-        <div class="container">
-          <span class="section-kicker">Marvel Network MVPs</span>
-          <h2 class="section-title">A few characters stand out.</h2>
-          <p class="section-lede">Rank characters by in-degree, out-degree, or total (undirected) degree — the most connected character on one metric isn't always the most connected on another. Click any character for a full profile.</p>
-          <div class="ranking-tabs" role="tablist" aria-label="Ranking metric">
-            <button class="btn active" data-rank-tab="topDegree" role="tab" aria-selected="true">🕸️ Degree</button>
-            <button class="btn" data-rank-tab="topInDegree" role="tab" aria-selected="false">⬇️ In-degree</button>
-            <button class="btn" data-rank-tab="topOutDegree" role="tab" aria-selected="false">⬆️ Out-degree</button>
-          </div>
-          <div class="mvp-grid" id="mvp-grid"></div>
-          <div class="profile-panel" id="profile-panel" aria-live="polite">
-            <div class="profile-header">
-              <h3 id="profile-name"></h3>
-              <button class="profile-close" id="profile-close" aria-label="Close profile">✕</button>
-            </div>
-            <div class="profile-stats" id="profile-stats"></div>
-            <p class="profile-interpretation" id="profile-interpretation"></p>
-            <div class="profile-badges" id="profile-badges"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. DEGREE DISTRIBUTION -->
-      <section id="distribution">
-        <div class="container">
-          <span class="section-kicker">Can You Spot the Super-Connectors?</span>
-          <h2 class="section-title">Degree distribution</h2>
-          <p class="section-lede">
-            Instead of asking how connected one character is, we count how many characters share each possible degree.
-            Hover any bar to see exactly how many characters have that degree.
-          </p>
-          <div class="chart-controls">
-            <button class="btn active" data-dist-scale="linear">Linear scale</button>
-            <button class="btn" data-dist-scale="log">Log–log scale</button>
-          </div>
-          <div class="chart-wrap">
-            <div id="dist-chart" style="min-height:340px"></div>
-            <p id="dist-hover-summary" class="chart-caption" aria-live="polite">Hover or tab through the bars to see exact counts.</p>
-          </div>
-          <p class="section-lede" style="margin-top:20px" id="dist-explainer">
-            The log–log plot makes the tail of the distribution easier to inspect. A long tail indicates that a small
-            number of characters have substantially more connections than most characters. Whether this pattern
-            follows a power law requires additional statistical analysis — we don't claim one here.
-          </p>
-          <p class="section-lede">
-            This unevenness is typical of real-world networks: most nodes have relatively few connections, while a
-            small number of "hub" nodes accumulate disproportionately many.
-          </p>
-          <details class="chart-summary">
-            <summary>Text summary of this chart</summary>
-            <div class="explainer-body" id="dist-text-summary"></div>
-          </details>
-        </div>
-      </section>
-
-      <!-- 5. IN-DEGREE VS OUT-DEGREE -->
-      <section id="inout">
-        <div class="container">
-          <span class="section-kicker">Direction Matters</span>
-          <h2 class="section-title">In-degree vs. out-degree</h2>
-          <p class="section-lede">
-            Each point is one Marvel character. <strong>High in-degree</strong> means many other pages link to this
-            character; <strong>high out-degree</strong> means this character's own page links out to many others.
-            The dashed line marks where in-degree equals out-degree — points far from it are the interesting outliers.
-            Scroll/pinch to zoom, drag to pan, hover for details.
-          </p>
-          <div class="chart-wrap">
-            <div id="scatter-chart" style="min-height:460px"></div>
-          </div>
-          <details class="chart-summary">
-            <summary>Text summary of this chart</summary>
-            <div class="explainer-body" id="scatter-text-summary"></div>
-          </details>
-        </div>
-      </section>
-
-      <!-- 6. EXPLORE THE NETWORK -->
-      <section id="network">
-        <div class="container">
-          <span class="section-kicker">Explore the Network</span>
-          <h2 class="section-title">The full Marvel web</h2>
-          <p class="section-lede">
-            Drag nodes, zoom, and pan. Search for a character to highlight them and their neighbors. Node color
-            shows connected component (cyan = the largest component); a gold ring marks an articulation point.
-          </p>
-          <div class="network-panel">
-            <div class="network-controls">
-              <div class="network-search">
-                <input type="text" id="graph-search" placeholder="Search a character…" aria-label="Search for a character" autocomplete="off" />
-                <div class="search-suggestions" id="graph-suggestions" hidden></div>
-              </div>
-              <div class="control-group">
-                <label for="min-degree">Min degree</label>
-                <input type="range" id="min-degree" min="0" max="30" value="0" />
-                <span id="min-degree-value">0</span>
-              </div>
-              <div class="control-group">
-                <label for="size-metric">Node size</label>
-                <select id="size-metric">
-                  <option value="undirectedDegree">Degree</option>
-                  <option value="inDegree">In-degree</option>
-                  <option value="outDegree">Out-degree</option>
-                </select>
-              </div>
-              <label class="control-group"><input type="checkbox" id="toggle-largest" /> Largest component only</label>
-              <label class="control-group"><input type="checkbox" id="toggle-isolates" checked /> Show isolates</label>
-              <label class="control-group"><input type="checkbox" id="toggle-labels" /> Labels</label>
-              <button class="btn" id="graph-reset">Reset view</button>
-            </div>
-            <div class="network-stage">
-              <svg id="network-svg" role="img" aria-label="Force-directed graph of the Marvel character network"></svg>
-            </div>
-          </div>
-          <p class="chart-caption" style="margin-top:10px">
-            <span class="legend-chip"><span class="legend-swatch" style="background:#37e6ff"></span>Largest component</span>
-            <span class="legend-chip"><span class="legend-swatch" style="background:#8c6bff"></span>Other components</span>
-            <span class="legend-chip"><span class="legend-swatch" style="background:transparent;border:2px solid #ffd23f"></span>Articulation point</span>
-          </p>
-        </div>
-      </section>
-
-      <!-- 7. MARVEL'S ISLANDS -->
-      <section id="islands">
-        <div class="container">
-          <span class="section-kicker">Marvel's Islands</span>
-          <h2 class="section-title">Most of the network lives on one giant island.</h2>
-          <p class="section-lede">
-            A <strong>connected component</strong> is a group of characters where every character can reach every
-            other character through some sequence of connections, when we ignore edge direction. An
-            <strong>isolated character</strong> has degree 0 — no links connect them to the rest of the network.
-          </p>
-          <div class="grid-2">
-            <div class="panel">
-              <h3 style="margin-top:0">Component sizes</h3>
-              <div id="component-bars"></div>
-            </div>
-            <div class="panel">
-              <h3 style="margin-top:0">Isolated characters</h3>
-              <p id="isolate-summary" class="section-lede" style="margin-bottom:10px"></p>
-              <div class="isolate-chip-list" id="isolate-chips"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 8. EXPERIMENTS -->
-      <section id="experiments">
-        <div class="container">
-          <span class="section-kicker">Fun Interactive Experiments</span>
-          <h2 class="section-title">But being popular isn't the only form of importance.</h2>
-          <p class="section-lede">
-            High degree does not necessarily mean structural importance. A character can be an
-            <strong>articulation point</strong> — removing them can split part of the network apart — even if their
-            raw degree isn't the highest. Try it below.
-          </p>
-
-          <div class="experiment-card">
-            <h3>👑 Who rules the network?</h3>
-            <p>Pick a metric and reveal the character who dominates it.</p>
-            <div class="experiment-controls">
-              <button class="btn" data-rule-metric="undirectedDegree">Highest degree</button>
-              <button class="btn" data-rule-metric="inDegree">Highest in-degree</button>
-              <button class="btn" data-rule-metric="outDegree">Highest out-degree</button>
-            </div>
-            <div class="result-box" id="rules-result"></div>
-          </div>
-
-          <div class="experiment-card" id="delete-hero-card">
-            <h3>💥 Delete a hero</h3>
-            <p>Select a character and simulate removing them from the network entirely.</p>
-            <div class="experiment-controls">
-              <select data-delete-select></select>
-              <button class="btn btn-primary" data-delete-run>Remove character</button>
-              <button class="btn" data-delete-reset>Reset</button>
-            </div>
-            <div class="result-box"></div>
-          </div>
-
-          <div class="experiment-card" id="path-finder-card">
-            <h3>🧭 Find a path</h3>
-            <p>Pick two characters and find the shortest path between them through the (undirected) network.</p>
-            <div class="experiment-controls">
-              <select data-path-a></select>
-              <span>→</span>
-              <select data-path-b></select>
-              <button class="btn btn-primary" data-path-run>Find path</button>
-            </div>
-            <div class="result-box"></div>
-          </div>
-
-          <div class="experiment-card" id="guess-card">
-            <h3>🎯 Guess the degree</h3>
-            <p id="guess-desc-wrap">How many connections does <strong data-guess-name>–</strong> have?</p>
-            <p class="chart-caption" data-guess-desc></p>
-            <input type="range" class="guess-slider" data-guess-slider min="0" max="50" value="10" />
-            <p class="guess-value"><span data-guess-value>10</span></p>
-            <div class="experiment-controls">
-              <button class="btn btn-primary" data-guess-reveal>Reveal actual degree</button>
-              <button class="btn" data-guess-next>Next character</button>
-            </div>
-            <div class="result-box"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 9. DENSITY -->
-      <section id="density">
-        <div class="container">
-          <span class="section-kicker">Network Density</span>
-          <h2 class="section-title">How full is the connection grid?</h2>
-          <p class="section-lede">
-            Even though the Marvel network contains many relationships, only a small fraction of all possible
-            character-to-character connections actually exist. Each cell below represents roughly one percentage
-            point of all possible undirected connections; filled cells are the ones that actually exist.
-          </p>
-          <div class="grid-2">
-            <div class="panel">
-              <div class="density-grid" id="density-grid" role="img"></div>
-              <p class="chart-caption" id="density-caption"></p>
-            </div>
-            <div class="panel">
-              <div class="stat-grid" id="density-stats"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 10. AHA! FINDINGS -->
-      <section id="aha">
-        <div class="container">
-          <span class="section-kicker">Aha! Findings</span>
-          <h2 class="section-title">What the data surprised us with</h2>
-          <p class="section-lede">These observations are generated automatically from the calculated statistics — not written in advance.</p>
-          <div class="aha-grid" id="aha-grid"></div>
-        </div>
-      </section>
-
-      <!-- 11. COURSE EXERCISE -->
-      <section id="exercise">
-        <div class="container">
-          <span class="section-kicker">🧠 Course Exercise</span>
-          <h2 class="section-title">Week 1 — Social Graphs &amp; Network Science</h2>
-          <p class="section-lede">
-            This site is our answer to the Week 1 exercise from the course
-            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week1.html" target="_blank" rel="noopener">Social Graphs and Interactions</a>.
-            The questions below are inspired by that exercise (not exact quotations of it) and map directly onto the sections above.
-          </p>
-          <div class="exercise-list">
-            <p class="exercise-q">What is the degree of each node? <span style="font-weight:400;color:var(--text-dim)"> — see Marvel Network MVPs and the interactive graph.</span></p>
-            <p class="exercise-q">How does the sum of degrees relate to the number of edges? <span style="font-weight:400;color:var(--text-dim)"> — see the validation checks in Methodology.</span></p>
-            <p class="exercise-q">What is the average degree? <span style="font-weight:400;color:var(--text-dim)"> — see The Network at a Glance.</span></p>
-            <p class="exercise-q">What is the density of the network? <span style="font-weight:400;color:var(--text-dim)"> — see Network Density.</span></p>
-            <p class="exercise-q">What does the degree distribution look like? <span style="font-weight:400;color:var(--text-dim)"> — see Degree Distribution.</span></p>
-            <p class="exercise-q">What happens when we look at in-degree versus out-degree? <span style="font-weight:400;color:var(--text-dim)"> — see In-degree vs. Out-degree.</span></p>
-            <p class="exercise-q">Which characters are the most connected? <span style="font-weight:400;color:var(--text-dim)"> — see Marvel Network MVPs.</span></p>
-            <p class="exercise-q">What does network structure tell us about importance? <span style="font-weight:400;color:var(--text-dim)"> — see Delete a Hero and Aha! Findings.</span></p>
-          </div>
-          <p class="section-lede" style="margin-top:20px">
-            Full exercise page: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week1.html" target="_blank" rel="noopener">sunelehmann.com/socialgraphs2026-web/weeks/week1.html</a>
-          </p>
-        </div>
-      </section>
-
-      <!-- 12. OUR DATA STORY -->
-      <section id="story">
-        <div class="container">
-          <span class="section-kicker">Our Data Story</span>
-          <h2 class="section-title">A student investigation</h2>
-          <div class="story-grid">
-            <div class="story-card"><h3>Our question</h3><p id="story-question"></p></div>
-            <div class="story-card"><h3>What we did</h3><p id="story-did"></p></div>
-            <div class="story-card"><h3>What we found</h3><p id="story-found"></p></div>
-            <div class="story-card"><h3>What surprised us</h3><p id="story-surprised"></p></div>
-          </div>
-          <h3 style="margin-top:34px;color:var(--accent-2);font-family:var(--font-display)">Automatically generated findings</h3>
-          <ul class="findings-list" id="findings-list"></ul>
-        </div>
-      </section>
-
-      <!-- 13. METHODOLOGY -->
-      <section id="methodology">
-        <div class="container">
-          <span class="section-kicker">Methodology</span>
-          <h2 class="section-title">How this was actually calculated</h2>
-          <p class="section-lede">
-            The Wikipedia network is <strong>directed</strong> (A → B means A's page links to B's page). For degree,
-            density, connected components, articulation points, and shortest paths, we convert it to an
-            <strong>undirected</strong> network (A ↔ B) — direction is only preserved for in-/out-degree analysis.
-          </p>
-          <div class="grid-2">
-            <details class="explainer" open>
-              <summary>Degree &amp; degree sums</summary>
-              <div class="explainer-body">
-                <p>For a directed graph: <code>sum(in-degree) = number of directed edges</code> and <code>sum(out-degree) = number of directed edges</code>.</p>
-                <p>For the undirected graph: <code>sum(degrees) = 2 × number of undirected edges</code>, because every edge touches two nodes.</p>
-              </div>
-            </details>
-            <details class="explainer">
-              <summary>Density</summary>
-              <div class="explainer-body">
-                <p><code>density = m / [n(n−1)/2]</code>, where <code>m</code> is the number of undirected edges and <code>n(n−1)/2</code> is the maximum possible number of undirected edges among <code>n</code> nodes.</p>
-              </div>
-            </details>
-            <details class="explainer">
-              <summary>Connected components &amp; isolates</summary>
-              <div class="explainer-body">
-                <p>Computed on the undirected graph via breadth-first search / graph traversal (NetworkX <code>connected_components</code>). A node with undirected degree 0 is isolated.</p>
-              </div>
-            </details>
-            <details class="explainer">
-              <summary>Articulation points</summary>
-              <div class="explainer-body">
-                <p>Computed on the undirected graph with NetworkX <code>articulation_points</code>, precomputed during the analysis build (not in the browser).</p>
-              </div>
-            </details>
-          </div>
-          <h3 style="margin-top:30px;color:var(--accent-2);font-family:var(--font-display)">Validation checks</h3>
-          <div id="validation-checks" class="stat-grid"></div>
-        </div>
-      </section>
-
-      <!-- 14. DATASET / REPRODUCIBILITY -->
-      <section id="dataset">
-        <div class="container">
-          <span class="section-kicker">Dataset &amp; Reproducibility</span>
-          <h2 class="section-title">Where this data comes from</h2>
-          <p class="section-lede">
-            This project uses the frozen Week 1 Marvel Wikipedia network dataset from the course: 303 characters
-            from Wikipedia's <a href="https://en.wikipedia.org/wiki/Category:Marvel_Comics_superheroes" target="_blank" rel="noopener">Category:Marvel Comics superheroes</a>,
-            and directed edges wherever one character's article links to another's.
-          </p>
-          <div class="panel">
-            <p><strong>Node roster:</strong> <code>data/raw/week1_nodes.tsv</code></p>
-            <p><strong>Edge list:</strong> <code>data/raw/week1_edges.tsv</code></p>
-            <p><strong>Rebuilding the analysis:</strong></p>
-            <pre style="background:var(--panel-2);padding:14px;border-radius:8px;overflow-x:auto"><code>npm run analyze
-# runs scripts/analyze.py, which reads data/raw/*.tsv and writes
-# data/processed/analysis.json — the single source of truth for this site.</code></pre>
-            <p id="dataset-generated-at" class="chart-caption"></p>
-          </div>
-        </div>
-      </section>
-    </div>
+    <section id="weeks">
+      <div class="container">
+        <span class="section-kicker">The Weeks</span>
+        <h2 class="section-title">Eight weeks, one shared playground</h2>
+        <p class="section-lede">Live weeks open our post for that week. Coming weeks aren't published yet.</p>
+        <div class="week-grid" id="week-grid"></div>
+        <noscript>
+          <p class="section-lede" style="margin-top:20px">JavaScript is disabled, so here are plain links to the live weeks:</p>
+          <ul>
+            <li><a href="weeks/week1.html">Week 1 — Marvel Network Explorer</a></li>
+            <li><a href="weeks/week2.html">Week 2 — The Friendship Paradox</a></li>
+            <li><a href="weeks/week3.html">Week 3 — Who Holds the Marvel Universe Together?</a></li>
+          </ul>
+        </noscript>
+      </div>
+    </section>
   </main>
 
   <footer>
     <div class="container">
-      <p>Built for the <strong>Social Graphs / Network Science</strong> course — Week 1 group exercise.</p>
+      <p>Built for the <strong>Social Graphs and Interactions</strong> course (DTU 02805).</p>
       <p>
-        Course exercise: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week1.html" target="_blank" rel="noopener">Week 1 page</a> ·
-        Data source: <a href="https://en.wikipedia.org/wiki/Category:Marvel_Comics_superheroes" target="_blank" rel="noopener">Wikipedia — Category:Marvel Comics superheroes</a>
+        Course site: <a href="https://sunelehmann.com/socialgraphs2026-web/index.html" target="_blank" rel="noopener">sunelehmann.com/socialgraphs2026-web</a>
       </p>
       <p>No official Marvel artwork, logos, or trademarks are used on this site. All visual design is original.</p>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-  <script type="module" src="src/js/main.js"></script>
+  <script type="module">
+    import { renderWeekGrid } from "./src/js/hub.js";
+    renderWeekGrid(document.getElementById("week-grid"));
+  </script>
 </body>
 </html>

@@ -2,7 +2,10 @@
 // Everything downstream reads from the single analysis.json produced by
 // scripts/analyze.py — nothing here invents numbers.
 
-const DATA_URL = "data/processed/analysis.json";
+// Resolved relative to this module's own URL, not the document — this file
+// is loaded from index.html (repo root) and from weeks/*.html alike, and
+// data/processed/ always sits two levels up from src/js/.
+const DATA_URL = new URL("../../data/processed/analysis.json", import.meta.url);
 
 export const store = {
   raw: null,

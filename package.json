@@ -1,10 +1,11 @@
 {
-  "name": "marvel-network-explorer",
-  "version": "1.0.0",
+  "name": "social-graphs-group-site",
+  "version": "2.0.0",
   "private": true,
-  "description": "Interactive Marvel Wikipedia social network explorer — Social Graphs / Network Science, Week 1.",
+  "description": "Social Graphs and Interactions (DTU 02805) — group course site: a week hub with one interactive post per week, mostly on the shared Marvel Wikipedia character network.",
   "scripts": {
     "analyze": "python scripts/analyze.py",
+    "analyze:week3": "python scripts/week3_analyze.py",
     "start": "npx --yes http-server . -p 8080 -c-1",
     "serve": "npm run start"
   },
