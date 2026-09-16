@@ -4,11 +4,41 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Week 2: The Friendship Paradox — Social Graphs Group Site</title>
-  <meta name="description" content="Does the friendship paradox hold in the Marvel Wikipedia character network? A degree-preserving null model, four networks compared, and a look at who's actually driving the effect." />
+  <meta name="description" content="Does the friendship paradox hold among Marvel superheroes? A null-model stress test of the Marvel Wikipedia character network, built for a Social Graphs / Network Science course." />
   <link rel="icon" href="data:," />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../src/css/styles.css" />
+  <style>
+    /* Small additions specific to this static write-up page — everything else reuses styles.css */
+    .figure-panel { padding: 18px; margin: 0 0 32px; }
+    .figure-panel img { display: block; width: 100%; border-radius: var(--radius-sm); background: #05070c; }
+    .prose { color: var(--text-dim); font-size: 1.02rem; max-width: 74ch; }
+    .prose p { margin: 0 0 16px; }
+    .prose strong { color: var(--text); }
+    .formula-box {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 14px 18px;
+      font-family: "Courier New", monospace;
+      font-size: 1.05rem;
+      color: var(--accent-2);
+      margin: 18px 0;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .quote-box {
+      background: rgba(255, 61, 104, 0.07);
+      border-left: 3px solid var(--accent);
+      padding: 16px 18px;
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: var(--text);
+      margin: 18px 0;
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -18,180 +48,280 @@
       <a href="#top" class="brand">MARVEL<span class="dot">•</span>NETWORK</a>
       <button class="btn btn-ghost nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links">☰ Menu</button>
       <div class="nav-links" id="nav-links">
-        <a href="#paradox">The Paradox</a>
-        <a href="#marvel">In Marvel</a>
-        <a href="#driving">Who's Driving It</a>
-        <a href="#null-model">Null Model</a>
+        <a href="#paradox">The paradox</a>
+        <a href="#four-networks">Four networks</a>
+        <a href="#drivers">Who drives it</a>
+        <a href="#null-model">Null model</a>
         <a href="#llm">Grading an LLM</a>
-        <a href="#limits">Limits</a>
+        <a href="#limits">Can't conclude</a>
       </div>
     </div>
   </nav>
 
   <main id="main">
-    <div class="container" style="padding-top:50px">
-      <span class="section-kicker" id="top">Week 2 · Models &amp; Null Models</span>
-      <h1 class="section-title" style="font-size:clamp(2rem,5vw,3rem)">Your Marvel friends are more popular than you</h1>
-      <div class="post-meta">
-        <span class="badge">Exercise 2.11 — Go nuts with your LLM</span>
-        <a class="badge" href="https://sunelehmann.com/socialgraphs2026-web/weeks/week2.html" target="_blank" rel="noopener">Course page ↗</a>
-        <a class="badge" href="week2/week2_gonuts.ipynb">Notebook ↗</a>
+    <!-- HERO -->
+    <section class="hero" style="min-height:70vh" id="top">
+      <div class="hero-content container">
+        <p class="hero-eyebrow">Social Graphs &amp; Network Science · Week 2 · Null Models</p>
+        <h1 style="font-size:clamp(2rem,6vw,4rem)">YOUR FRIENDS ARE MORE POPULAR THAN YOU</h1>
+        <p class="hero-subtitle">
+          The friendship paradox, stress-tested on the Marvel character network with
+          Barabási–Albert graphs, random controls, and 500 degree-preserving shuffles.
+        </p>
+        <div class="hero-stats" id="hero-stats">
+          <div class="hero-stat"><span class="value">277</span><span class="label">Characters analyzed</span></div>
+          <div class="hero-stat"><span class="value">76%</span><span class="label">Friend ≥ as popular</span></div>
+          <div class="hero-stat"><span class="value">1</span><span class="label">Never out-popularity'd</span></div>
+          <div class="hero-stat"><span class="value">500</span><span class="label">Null-model shuffles</span></div>
+        </div>
+        <a href="#paradox" class="btn btn-primary">Read the analysis ↓</a>
       </div>
-      <p class="section-lede">
-        Ask any of the 277 connected characters in Wikipedia's Marvel superhero network how many friends their
-        friends have, on average, and the answer is almost always "more than I have." That's not a personality
-        flaw, it's arithmetic — and it's a clean illustration of a null-model idea from this week's toolkit: a
-        statistic that looks like a fact about <em>this specific network</em> turns out to be entirely explained by
-        its degree sequence.
-      </p>
-    </div>
+    </section>
 
+    <!-- INTRO / HOOK -->
+    <section>
+      <div class="container">
+        <span class="section-kicker">The Hook</span>
+        <h2 class="section-title">Ask any character how popular their friends are.</h2>
+        <div class="prose">
+          <p>
+            Ask any of the 277 connected characters in Wikipedia's Marvel superhero network how many
+            friends their friends have, on average, and the answer is almost always
+            <strong>"more than I have."</strong> That's not a personality flaw, it's arithmetic — and
+            it's a clean illustration of a null-model idea from this week's toolkit: a statistic that
+            looks like a fact about <em>this specific network</em> turns out to be entirely explained
+            by its degree sequence.
+          </p>
+          <p>
+            <strong>Method, in three sentences:</strong> we built the network from Wikipedia's
+            <em>Category:Marvel Comics superheroes</em> (303 characters, 1,784 directed hyperlink
+            edges), collapsed it to an undirected simple graph, and restricted to the largest
+            connected component (277 characters, 1,421 edges), since "who's your friend's friend"
+            only makes sense within one connected piece. We then compared the network against
+            Barabási–Albert and Erdős–Rényi controls, and null-modeled it with 500 degree-preserving
+            shuffles. Full code: <a href="week2/week2_gonuts.ipynb">week2_gonuts.ipynb</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 1: THE PARADOX STATED -->
     <section id="paradox">
-      <div class="container post-body">
-        <h2 class="section-title">The paradox and why it must exist</h2>
-        <p>
-          Compare two averages: the mean degree of a character picked uniformly at random (⟨k⟩), and the mean
-          degree of <em>a random friend</em> — reached by picking a random character, then a uniformly random one
-          of their links (⟨k<sub>nn</sub>⟩). These aren't the same sampling process. Following a link samples a
-          node with probability proportional to its own degree, so hubs get over-represented among "friends"
-          relative to how often they get sampled as "the person." One line of algebra makes the gap exact:
-        </p>
-        <p class="callout"><code>⟨k_nn⟩ = ⟨k²⟩ / ⟨k⟩ = ⟨k⟩ + σ² / ⟨k⟩</code></p>
-        <p>
-          The excess over ⟨k⟩ is exactly σ²/⟨k⟩ — the degree variance, rescaled. It is zero only when every node has
-          the same degree, small when degrees cluster near the mean (Erdős–Rényi), and large whenever a few hubs
-          stretch the tail (scale-free networks). So the paradox isn't really about "hubs" as a special ingredient;
-          it's about degree <em>variance</em>, full stop — hubs are just an efficient way to get a lot of it.
-        </p>
+      <div class="container">
+        <span class="section-kicker">Part 1 · Stating the Paradox</span>
+        <h2 class="section-title">Two averages, biased by construction</h2>
+        <div class="prose">
+          <p>
+            Two averages get compared, and they are not the same quantity: <strong>⟨k⟩</strong>, the
+            mean degree of a character picked uniformly at random ("how many friends does a random
+            person have"), and <strong>⟨k<sub>nn</sub>⟩</strong>, the mean degree of <em>a random
+            friend</em> — reached by picking a random character, then following a uniformly random
+            one of their links ("how many friends does a random person's random friend have").
+          </p>
+          <p>
+            Following a link does not sample nodes uniformly — it samples a node with probability
+            proportional to <em>its own degree</em>. High-degree nodes are systematically
+            over-represented among "friends." One line of algebra makes the gap exact:
+          </p>
+          <div class="formula-box">⟨k_nn⟩ = ⟨k²⟩ / ⟨k⟩ = ⟨k⟩ + σ² / ⟨k⟩</div>
+          <p>
+            The excess over ⟨k⟩ is exactly <strong>σ²/⟨k⟩</strong> — the degree variance, rescaled. It
+            is zero only when every node has the same degree, small when degrees cluster near the
+            mean (Erdős–Rényi), and large whenever a few hubs stretch the tail (scale-free networks).
+            The paradox isn't really about "hubs" as a special ingredient; it's about degree
+            <strong>variance</strong>, full stop — hubs are just an efficient way to get a lot of it.
+          </p>
+        </div>
+        <div class="stat-grid" style="margin-top:24px">
+          <div class="stat-card in-view"><span class="value">10.26</span><span class="label">⟨k⟩ — mean degree</span></div>
+          <div class="stat-card in-view"><span class="value">123.0</span><span class="label">σ² — degree variance</span></div>
+          <div class="stat-card in-view"><span class="value">22.25</span><span class="label">⟨k_nn⟩ formula (exact)</span></div>
+          <div class="stat-card in-view"><span class="value">24.90</span><span class="label">⟨k_nn⟩ unweighted (exact)</span></div>
+        </div>
       </div>
     </section>
 
-    <section id="marvel">
-      <div class="container post-body">
-        <h2 class="section-title">Does it hold in the Marvel network? Yes, and it's not close</h2>
-        <p>
-          We built the network from Wikipedia's <code>Category:Marvel Comics superheroes</code> (303 characters,
-          1,784 directed hyperlink edges), collapsed it to an undirected simple graph, and restricted to the largest
-          connected component — 277 characters, 1,421 edges — since "who's your friend's friend" only makes sense
-          within one connected piece. On that network: ⟨k⟩ = 10.26, σ² = 123.0, giving a formula-predicted
-          ⟨k<sub>nn</sub>⟩ = 22.25. Sampling 1,000 (person, random-friend) pairs directly (person uniform, friend
-          uniform among that person's links) gives a mean friend degree of 25.7 versus a mean person degree of 9.8,
-          and the friend is at least as connected as the person in <strong>76%</strong> of draws.
-        </p>
-        <p>
-          To calibrate what "large" means here, we ran the identical procedure on three more networks: a 5,000-node
-          Barabási–Albert network (m=1, from exercise 2.5b), an Erdős–Rényi <code>G(n,m)</code> control matched to
-          it, and a second <code>G(n,m)</code> control matched to Marvel's own size (277 nodes, 1,421 edges).
+    <!-- PART 2: FOUR NETWORKS -->
+    <section id="four-networks">
+      <div class="container">
+        <span class="section-kicker">Part 2 · Four Networks, One Procedure</span>
+        <h2 class="section-title">Does it hold in the Marvel network? Yes, and it's not close.</h2>
+        <p class="section-lede">
+          Sampling 1,000 (person, random-friend) pairs directly — person uniform, friend uniform among
+          that person's links — on four networks: a 5,000-node Barabási–Albert network (m=1, from
+          exercise 2.5b), an Erdős–Rényi <code>G(n,m)</code> control matched to it, Marvel itself, and a
+          second <code>G(n,m)</code> control matched to Marvel's own size.
         </p>
 
-        <figure class="post-figure">
-          <img src="week2/figures/fig1_degree_ccdf.png" alt="Log-log complementary CDF of degree for the Marvel network, its 5000-node Barabási–Albert comparison, and their size-matched random controls; Marvel and BA both show visibly heavier tails than their random controls." />
-          <figcaption><strong>Figure 1</strong> — Degree CCDF, log-log. Marvel and BA(5000) both show visibly heavier tails than their size-matched random controls; the steeper and straighter the tail, the larger the σ² feeding the formula above.</figcaption>
+        <figure class="panel figure-panel">
+          <img src="week2/figures/fig1_degree_ccdf.png" alt="Degree CCDF on log-log axes for BA(5000), its random control, Marvel, and Marvel's random control" loading="lazy" />
+          <figcaption class="chart-caption">
+            <strong>Figure 1 — Degree CCDF, log-log.</strong> Marvel and BA(5000) both show visibly
+            heavier tails than their size-matched random controls; the steeper and straighter the
+            tail, the larger the σ² feeding the formula above.
+          </figcaption>
         </figure>
 
-        <figure class="post-figure">
-          <img src="week2/figures/fig2_paradox_by_network.png" alt="Bar chart comparing mean person degree to mean friend degree across four networks — Marvel, its random control, Barabási–Albert, and its random control — with the fraction of pairs where the friend is at least as connected labeled on each bar." />
-          <figcaption><strong>Figure 2</strong> — Mean person vs. mean friend degree, 1,000 samples per network (bar labels: fraction of pairs where the friend is at least as connected). The random control matched to Marvel barely separates the two bars (fraction 0.60); Marvel itself separates them by a factor of ~2.6 (fraction 0.76); BA(5000) separates them by a factor of ~4.5 (fraction 0.81) despite average degree there being only 2. The paradox scales with tail weight, not with network size.</figcaption>
+        <figure class="panel figure-panel">
+          <img src="week2/figures/fig2_paradox_by_network.png" alt="Bar chart comparing mean person degree vs mean friend degree across the four networks" loading="lazy" />
+          <figcaption class="chart-caption">
+            <strong>Figure 2 — Mean person vs. mean friend degree</strong>, 1,000 samples per network
+            (bar labels: fraction of pairs where the friend is at least as connected). The random
+            control matched to Marvel barely separates the two bars (fraction 0.60); Marvel itself
+            separates them by a factor of ~2.6 (fraction 0.76); BA(5000) separates them by a factor of
+            ~4.5 (fraction 0.81) despite average degree there being only 2. The paradox scales with
+            tail weight, not with network size.
+          </figcaption>
         </figure>
 
-        <p>
-          The random control is the honest baseline here, and it's telling: even with <strong>zero preferential
-          structure</strong>, a same-size Poisson-degree network still shows the friend ahead of the person 60% of
-          the time — the paradox never fully disappears, it just gets much smaller. Real Marvel and BA sit well
-          above that floor.
-        </p>
+        <div class="prose">
+          <p>
+            The random control is the honest baseline here, and it's telling: even with
+            <strong>zero preferential structure</strong>, a same-size Poisson-degree network still
+            shows the friend ahead of the person 60% of the time — the paradox never fully
+            disappears, it just gets much smaller. Real Marvel and BA sit well above that floor.
+          </p>
+        </div>
       </div>
     </section>
 
-    <section id="driving">
-      <div class="container post-body">
+    <!-- WHO DRIVES IT -->
+    <section id="drivers">
+      <div class="container">
+        <span class="section-kicker">Names, Not Just Averages</span>
         <h2 class="section-title">Who's actually driving it</h2>
-        <p>
-          Averages hide the story. For every character, we computed the fraction of their friends who are at least
-          as connected as they are — call it their "out-popularity'd rate."
+        <p class="section-lede">
+          For every character, we computed the fraction of their friends who are at least as
+          connected as they are — call it their <strong>"out-popularity'd rate."</strong>
         </p>
 
-        <figure class="post-figure">
-          <img src="week2/figures/fig3_out_popularity_rate.png" alt="Histogram of the out-popularity'd rate across all 277 giant-component characters, showing most characters concentrated at a high rate and a spike at 100%." />
-          <figcaption><strong>Figure 3</strong> — Distribution of the out-popularity'd rate across all 277 characters. Median character: about 5 out of 6 friends are at least as popular as they are. 116 characters (42%) are out-popularity'd by <em>every single friend</em>. Exactly one character — Spider-Man, degree 106, more than 40 links ahead of the #2 hub (Hulk, 65) — is never out-popularity'd: every one of his 106 neighbors has strictly lower degree than he does.</figcaption>
+        <figure class="panel figure-panel">
+          <img src="week2/figures/fig3_out_popularity_rate.png" alt="Histogram of out-popularity'd rate across 277 Marvel characters, with Spider-Man marked at rate zero" loading="lazy" />
+          <figcaption class="chart-caption">
+            <strong>Figure 3 — Distribution of the out-popularity'd rate</strong> across all 277
+            characters. Median character: about 5 out of 6 friends are at least as popular as they
+            are.
+          </figcaption>
         </figure>
 
-        <p>
-          Spider-Man is the whole story in miniature: a single dominant hub is enough to make almost the entire rest
-          of the network "friends with someone more popular than them," without needing any of the other 276
-          characters to be unusual in any way.
-        </p>
+        <ul class="findings-list">
+          <li><strong>Spider-Man (degree 106)</strong> is the only character never out-popularity'd — every one of his 106 neighbors has strictly lower degree than he does. He's more than 40 links ahead of the #2 hub, Hulk (65).</li>
+          <li><strong>116 characters (42%)</strong> are out-popularity'd by <em>every single friend</em> they have.</li>
+          <li>The <strong>median</strong> character has roughly 5 out of 6 friends at least as popular as they are.</li>
+        </ul>
+        <div class="prose" style="margin-top:16px">
+          <p>
+            Spider-Man is the whole story in miniature: a single dominant hub is enough to make
+            almost the entire rest of the network "friends with someone more popular than them,"
+            without needing any of the other 276 characters to be unusual in any way.
+          </p>
+        </div>
       </div>
     </section>
 
+    <!-- PART 3: NULL MODEL -->
     <section id="null-model">
-      <div class="container post-body">
-        <h2 class="section-title">Null model: is this about Marvel, or just about its degree sequence?</h2>
-        <p>
-          Here's the null-model question: does the paradox's strength depend on <em>which</em> characters link to
-          which (team affiliations, storyline clusters, editorial prominence), or purely on how many links each
-          character has? We generated 500 degree-preserving randomizations of the Marvel network
-          (<code>nx.double_edge_swap</code>, 10×edges swap attempts per realization, <code>max_tries=100×edges</code>,
-          seed 2026) — each shuffle keeps every character's degree exactly fixed while scrambling who they're
-          actually linked to — and reran the same 1,000-pair sampling on each.
-        </p>
+      <div class="container">
+        <span class="section-kicker">Part 3 · Null-Model It</span>
+        <h2 class="section-title">Is this about Marvel, or just its degree sequence?</h2>
+        <div class="prose">
+          <p>
+            Does the paradox's strength depend on <em>which</em> characters link to which (team
+            affiliations, storyline clusters, editorial prominence), or purely on how many links each
+            character has? We generated <strong>500 degree-preserving randomizations</strong> of the
+            Marvel network (<code>nx.double_edge_swap</code>, 10×edges swap attempts per realization,
+            <code>max_tries=100×edges</code>, seed 2026) — each shuffle keeps every character's degree
+            exactly fixed while scrambling who they're actually linked to — and reran the same
+            1,000-pair sampling on each.
+          </p>
+        </div>
 
-        <figure class="post-figure">
-          <img src="week2/figures/fig4_null_model.png" alt="Two histograms of null-model outcomes from 500 degree-preserving shuffles, with the real Marvel value marked in red: fraction of pairs where friend degree exceeds person degree (left), and mean friend degree (right). The real value sits inside both null distributions in both panels." />
-          <figcaption><strong>Figure 4</strong> — Null distributions from 500 degree-preserving shuffles, real Marvel marked in red. Left: fraction of pairs where friend ≥ person (real = 0.75, null mean = 0.76 ± 0.01, z = −0.98, empirical p = 0.35). Right: mean friend degree (real = 24.8, null mean = 24.4 ± 0.9, z = +0.36, empirical p = 0.73). Neither is remotely significant.</figcaption>
+        <figure class="panel figure-panel">
+          <img src="week2/figures/fig4_null_model.png" alt="Histograms of the null distribution from 500 degree-preserving shuffles, with real Marvel marked in red on both panels" loading="lazy" />
+          <figcaption class="chart-caption">
+            <strong>Figure 4 — Null distributions from 500 degree-preserving shuffles</strong>, real
+            Marvel marked in red. Left: fraction of pairs where friend ≥ person (real = 0.75, null
+            mean = 0.76 ± 0.01, z = −0.98, empirical p = 0.35). Right: mean friend degree (real =
+            24.8, null mean = 24.4 ± 0.9, z = +0.36, empirical p = 0.73). Neither is remotely
+            significant.
+          </figcaption>
         </figure>
 
-        <p>
-          Real Marvel lands squarely inside both null distributions. This is the expected, slightly boring result,
-          and that's the finding: the edge-weighted formula ⟨k<sub>nn</sub>⟩ = ⟨k⟩ + σ²/⟨k⟩ depends only on the
-          degree sequence by construction, so it <em>cannot</em> move under a degree-preserving shuffle — and here,
-          neither does the empirically sampled version. Whatever narrative structure actually connects these
-          characters (which team someone is on, which storyline they appear in) contributes nothing measurable
-          beyond what their degree already implies. To sanity-check the other end of the variance axis, we also ran
-          an 8-regular random graph on 277 nodes (σ² = 0 by construction): mean person and mean friend degree came
-          out identical, 8.00 = 8.00, confirming variance — not "hubs" as a category — is the necessary and
-          sufficient ingredient.
-        </p>
+        <div class="prose">
+          <p>
+            Real Marvel lands squarely inside both null distributions. This is the expected, slightly
+            boring result, and <strong>that's the finding</strong>: the edge-weighted formula
+            ⟨k_nn⟩ = ⟨k⟩ + σ²/⟨k⟩ depends only on the degree sequence by construction, so it cannot
+            move under a degree-preserving shuffle — and here, neither does the empirically sampled
+            version. Whatever narrative structure actually connects these characters contributes
+            nothing measurable beyond what their degree already implies.
+          </p>
+          <p>
+            To sanity-check the other end of the variance axis, we also ran an 8-regular random graph
+            on 277 nodes (σ² = 0 by construction): mean person and mean friend degree came out
+            identical, <strong>8.00 = 8.00</strong>, confirming variance — not "hubs" as a category —
+            is the necessary and sufficient ingredient.
+          </p>
+        </div>
       </div>
     </section>
 
+    <!-- PART 4: LLM GRADING -->
     <section id="llm">
-      <div class="container post-body">
-        <h2 class="section-title">Grading an LLM's explanation</h2>
-        <p>
-          A typical LLM answer to "why do my friends have more friends than me" correctly identifies the sampling
-          mechanism (popular nodes get over-sampled as friends) but tends to overclaim two things: that it's
-          specifically about "hubs" rather than variance in general, and that it "disappears" in random networks.
-          Neither survives contact with the numbers above — the random control still shows the friend ahead 60% of
-          the time, and an 8-regular graph (no hubs, no variance) is the only network here where the effect is
-          actually zero.
+      <div class="container">
+        <span class="section-kicker">Part 4 · Grading an LLM</span>
+        <h2 class="section-title">What a typical AI explanation gets wrong</h2>
+        <p class="section-lede">
+          A representative explanation an LLM tends to produce when asked "why do my friends have
+          more friends than me," graded against the formula from Part 1 and the numbers above.
         </p>
-        <p class="callout">
-          The single best wrong sentence an LLM produced when we tried this: <em>"the effect disappears in a random
-          network where there's no popular people to bias the sample"</em> — random networks still have
-          mildly-more-popular-than-average nodes, and that alone is enough to keep the paradox alive, just weaker.
-        </p>
+        <blockquote class="quote-box">
+          "This is called the friendship paradox. It happens because popular people — hubs with lots
+          of connections — show up in many other people's friend lists, so when you look at your
+          friends, you're more likely to have sampled one of these popular people. Basically, your
+          friends have more friends than you because well-connected people are friends with
+          everyone. This is why the effect is strongest in networks with hubs, like scale-free
+          networks, and why it disappears in a random network where there's no popular people to
+          bias the sample."
+        </blockquote>
+        <ul class="findings-list">
+          <li><strong>Correct:</strong> popular nodes get over-sampled as "friends" — the right mechanism (size-biased sampling).</li>
+          <li><strong>Overclaim:</strong> "your friends have more friends than you" is a statement about population means, not a guarantee for every individual — Spider-Man's own friends are all <em>less</em> connected than he is.</li>
+          <li><strong>Missing the mechanism:</strong> never mentions <em>variance</em>. "Hubs" describes one way to get large σ², not the mechanism itself.</li>
+          <li><strong>Flatly wrong:</strong> the paradox does <em>not</em> disappear in random networks — our random control still shows the friend ahead 60% of the time. It only truly vanishes at σ² = 0, as the 8-regular graph above demonstrates.</li>
+        </ul>
+        <div class="prose" style="margin-top:16px">
+          <p>
+            <strong>Best wrong sentence:</strong> <em>"the effect disappears in a random network where
+            there's no popular people to bias the sample"</em> — random networks still have
+            mildly-more-popular-than-average nodes, and that alone is enough to keep the paradox
+            alive, just weaker.
+          </p>
+        </div>
       </div>
     </section>
 
+    <!-- LIMITATIONS -->
     <section id="limits">
-      <div class="container post-body">
+      <div class="container">
+        <span class="section-kicker">Honesty Check</span>
         <h2 class="section-title">What we can't conclude</h2>
-        <p>
-          This is a Wikipedia hyperlink graph, not a social network — an edge means "the article for A links to the
-          article for B," which tracks narrative and editorial prominence more than friendship, so "degree" here is
-          closer to "narrative centrality" than "number of friends." We also discarded edge direction (reciprocity
-          is only 0.39 — many links are one-way) and dropped 17 isolated characters plus 9 small side-components to
-          get a single connected piece to sample from. And the null-model result, however clean, is a non-finding:
-          it says this particular test with 500 shuffles couldn't detect extra structure beyond the degree sequence,
-          not that no such structure exists anywhere in the network.
-        </p>
-        <h3>Conclusion</h3>
-        <p>
-          The friendship paradox holds hard in the Marvel network — driven almost entirely by one hub, Spider-Man —
-          and a 500-shuffle degree-preserving null model confirms it needs nothing more than the degree sequence to
-          appear: give any network this much variance in connections, real or shuffled, and everyone's friends end
-          up more popular than they are.
+        <ul class="findings-list">
+          <li>This is a <strong>Wikipedia hyperlink graph, not a social network</strong> — an edge means "the article for A links to the article for B," tracking narrative/editorial prominence more than friendship.</li>
+          <li>We <strong>discarded edge direction</strong> (reciprocity is only 0.39 — many links are one-way).</li>
+          <li>We <strong>dropped 17 isolated characters</strong> and 9 small side-components to get a single connected piece to sample from.</li>
+          <li>The null-model result is a <strong>non-finding</strong>: it says this test with 500 shuffles couldn't detect extra structure beyond the degree sequence, not that no such structure exists anywhere.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CONCLUSION -->
+    <section>
+      <div class="container">
+        <p class="story-beat">
+          Give any network this much variance in connections, real or shuffled, and everyone's
+          friends end up more popular than they are — Spider-Man doesn't need to be
+          <em>specifically</em> Spider-Man for the paradox to hold, he just needs to be the one hub.
         </p>
       </div>
     </section>
@@ -199,10 +329,14 @@
 
   <footer>
     <div class="container">
-      <p>Built for the <strong>Social Graphs / Network Science</strong> course — Week 2 group exercise.</p>
       <p>
-        Course exercise: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week2.html" target="_blank" rel="noopener">Week 2 page</a> ·
-        Notebook: <a href="week2/week2_gonuts.ipynb">week2_gonuts.ipynb</a>
+        Week 2 "go nuts" post for <strong>Social Graphs and Interactions</strong>, exercise 2.9 — The
+        friendship paradox as a null-model exercise. Reuses the frozen Week 1 Marvel Wikipedia
+        dataset (303 characters, Category:Marvel Comics superheroes).
+      </p>
+      <p>
+        <a href="week2/week2_gonuts.ipynb">Full notebook</a> ·
+        <a href="week2/week2_gonuts.md">Markdown write-up</a>
       </p>
       <p>No official Marvel artwork, logos, or trademarks are used on this site. All visual design is original.</p>
     </div>
