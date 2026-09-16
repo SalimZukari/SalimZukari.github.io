@@ -235,11 +235,16 @@ export function renderComponentBars(container, components) {
 }
 
 /**
- * Week 3: z-score (betweenness or closeness) vs. degree, log-x scatter,
- * with a handful of nodes labeled and a y=0 reference line.
+ * Week 3: z-score (betweenness or closeness) vs. degree, log-x scatter.
+ * Nothing is permanently labeled with text (with ~280 points that's
+ * unreadable no matter how few labels you pick) — a handful of notable
+ * outliers just get a bigger, ringed dot, and every dot reveals its name
+ * and exact (degree, z) position on hover, focus, or click/tap, via both
+ * a floating tooltip and a persistent on-chart readout so the ID is still
+ * visible after the pointer moves away (and works on touch/keyboard).
  * @param {HTMLElement} container
  * @param {Array<{id:string,name:string,degree:number,z:number}>} points
- * @param {{ label: string, labelIds?: string[], onClick?: Function }} opts
+ * @param {{ label: string, labelIds?: string[], onSelect?: Function }} opts
  */
 export function renderZScoreScatter(container, points, opts = {}) {
   clear(container);
@@ -275,32 +280,42 @@ export function renderZScoreScatter(container, points, opts = {}) {
 
   const labelSet = new Set(opts.labelIds || []);
 
-  g.selectAll("circle.zdot")
+  function selectPoint(event, d, dotSelection) {
+    dotSelection.attr("stroke", null).attr("stroke-width", null);
+    d3.select(event.currentTarget).attr("stroke", "var(--accent-3)").attr("stroke-width", 2.5);
+    if (opts.onSelect) opts.onSelect(d);
+  }
+
+  const dots = g
+    .selectAll("circle.zdot")
     .data(points)
     .join("circle")
-    .attr("class", "zdot scatter-dot")
+    .attr("class", "zdot")
     .attr("cx", (d) => x(Math.max(d.degree, 1)))
     .attr("cy", (d) => y(d.z))
     .attr("r", (d) => (labelSet.has(d.id) ? 6 : 4))
     .attr("fill", (d) => (d.z >= 0 ? "var(--accent-2)" : "var(--accent)"))
+    .attr("fill-opacity", (d) => (labelSet.has(d.id) ? 1 : 0.55))
     .attr("tabindex", "0")
-    .attr("aria-label", (d) => `${d.name}: degree ${d.degree}, z=${d.z.toFixed(2)}`)
+    .attr("role", "button")
+    .attr("aria-label", (d) => `${d.name}: degree ${d.degree}, z-score ${d.z.toFixed(2)}`);
+
+  dots
     .on("mouseenter focus", function (event, d) {
+      d3.select(this).raise();
       showTip(`<strong>${d.name}</strong><br>degree ${d.degree}<br>z = ${d.z.toFixed(2)}`, event);
     })
     .on("mousemove", (event) => showTip(tooltip().innerHTML, event))
     .on("mouseleave blur", () => hideTip())
-    .on("click", (event, d) => opts.onClick && opts.onClick(d));
-
-  g.selectAll("text.zlabel")
-    .data(points.filter((d) => labelSet.has(d.id)))
-    .join("text")
-    .attr("class", "zlabel")
-    .attr("x", (d) => x(Math.max(d.degree, 1)) + 7)
-    .attr("y", (d) => y(d.z) - 7)
-    .attr("fill", "var(--text-dim)")
-    .style("font-size", "0.7rem")
-    .text((d) => d.name);
+    .on("click", function (event, d) {
+      selectPoint(event, d, dots);
+    })
+    .on("keydown", function (event, d) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectPoint(event, d, dots);
+      }
+    });
 }
 
 /**

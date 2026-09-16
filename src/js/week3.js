@@ -105,7 +105,15 @@ function renderBrokers(w3) {
     z: v.zBetweenness,
   }));
   const labelIds = [...w3.brokers.topPositiveZBetweenness.slice(0, 6), ...w3.brokers.topNegativeZBetweenness.slice(0, 3)];
-  renderZScoreScatter(document.getElementById("brokers-chart"), points, { label: "betweenness", labelIds });
+  const pinned = document.getElementById("brokers-pinned");
+  renderZScoreScatter(document.getElementById("brokers-chart"), points, {
+    label: "betweenness",
+    labelIds,
+    onSelect: (d) => {
+      const zClass = d.z >= 0 ? "z-pos" : "z-neg";
+      pinned.innerHTML = `<strong>${d.name}</strong> — degree ${d.degree}, betweenness z-score <span class="${zClass}">${d.z >= 0 ? "+" : ""}${d.z.toFixed(2)}</span>`;
+    },
+  });
 
   const rows = w3.brokers.topPositiveZBetweenness
     .slice(0, 6)

@@ -1047,3 +1047,26 @@ a.week-card:hover, a.week-card:focus-visible {
 .llm-claim { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 12px; }
 .llm-claim .verdict { color: var(--accent); font-weight: 800; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
 .llm-claim .verdict.ok { color: var(--ok); }
+
+/* ---------- Week 3: z-score scatter dots ---------- */
+.zdot {
+  cursor: pointer;
+  transition: r 0.1s ease, fill-opacity 0.1s ease;
+}
+.zdot:hover, .zdot:focus-visible {
+  fill-opacity: 1 !important;
+  outline: none;
+}
+.scatter-pinned {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  min-height: 1.4em;
+}
+.scatter-pinned strong { color: var(--text); }
+.scatter-pinned .z-pos { color: var(--accent-2); }
+.scatter-pinned .z-neg { color: var(--accent); }
