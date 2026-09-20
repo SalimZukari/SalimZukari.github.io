@@ -1,6 +1,7 @@
 # 🕸️ Social Graphs & Interactions — Group Site
 
 s264009, s263994, s264007
+
 Our group's weekly posts for the **Social Graphs and Interactions** course (DTU 02805),
 built as a week hub: `index.html` is a landing page with a card for each week, and each
 week's post lives at `weeks/weekN.html`. Most weeks work the shared Marvel Wikipedia
