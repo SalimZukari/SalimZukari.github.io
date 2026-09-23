@@ -4,3 +4,4 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+data/processed/.week4_cache/

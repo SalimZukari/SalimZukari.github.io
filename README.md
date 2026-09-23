@@ -16,7 +16,8 @@ Course home: https://sunelehmann.com/socialgraphs2026-web/index.html
 | 1 | Networks | [Marvel Network Explorer](weeks/week1.html) — degree, density, components, articulation points | Live |
 | 2 | Models & null models | [The Friendship Paradox](weeks/week2.html) — degree-preserving null model on Marvel | Live |
 | 3 | Who matters, and why | [Who Holds the Marvel Universe Together?](weeks/week3.html) — brokers, robustness, six degrees of Spider-Man | Live |
-| 4–8 | Communities & backbones, NLP I–III, Networks × language | — | Coming |
+| 4 | Communities & backbones | [Solid Cores, Moving Borders](weeks/week4.html) — where are the borders of philosophy? Louvain stability, Infomap, overlap, disparity backbone on the philosophers network | Live |
+| 5–8 | NLP I–III, Networks × language | — | Coming |
 
 The Week 1 page includes a dedicated **🧠 Course Exercise** section mapping the Week 1
 questions (degree, degree sums, average degree, density, degree distribution, in/out-degree,
@@ -35,6 +36,18 @@ course data page each week — no newer Marvel snapshot has been published as of
 
 17 characters in the roster have no edges at all — every analysis script loads the **node
 roster first** so these isolated characters are never accidentally dropped.
+
+Week 4 switches to the course's **philosophers network** (the course dataset's one exception), with Marvel as the contrast:
+
+- `data/raw/week4_philosophers_nodes.tsv`: 1,444 philosophers born before 1900, from Wikipedia's seven
+  "List of philosophers born in the …" lists (frozen snapshot 2026-09-15), with `era` and `subfields` columns
+- `data/raw/week4_philosophers_edges.tsv`: 11,135 directed edges with a weight (how many times A's article links B's);
+  summed over both directions: 9,140 undirected links, giant component 1,374 / 9,139
+- `data/raw/week4_edges_weighted.tsv`: the 1,784 Marvel edges with the same kind of weight (snapshot 2026-09-06)
+- `data/raw/week4_wikidata_movement_cache.json`: Wikidata P135 "movement" labels for the philosophers, fetched once
+  (2026-09-23) and cached so the pipeline runs offline
+
+All three TSVs were downloaded from the course data page on 2026-09-23 and are byte-identical to the class hand-outs.
 
 ## Analysis pipelines
 
@@ -60,15 +73,29 @@ from the Wikidata API (property P463, "member of"); the first run fetches and ca
 `data/raw/week3_wikidata_team_cache.json`, so later runs are offline and reproducible. See
 `weeks/week3/week3_gonuts.ipynb` for the exploration and validation cells.
 
+**Week 4 — `scripts/week4_analyze.py` → `data/processed/week4.json` + `weeks/week4/figures/`.** Louvain with ten seeds
+(NMI matrix, consensus partition, per-philosopher stability), modularity against configuration-model, double-edge-swap and
+G(n, m) nulls for the philosophers and Marvel, Infomap (undirected and directed, with its own shuffle null), k-clique
+communities (k = 3–6), our own link clustering (Ahn, Bagrow & Lehmann 2010), weighted Louvain against a
+weight-permutation null, our own disparity filter (course table, thresholds, a 0.001-step α sweep, the break point and
+its articulation point, the single-link "hinges"), a precomputed backbone layout, static figures and the LLM box. Shared
+helpers live in `scripts/netlib.py` (generalised from `weeks/week3/network_utils.py`). Heavy steps are cached in
+`data/processed/.week4_cache/` (git-ignored), keyed by a hash of the inputs; `python scripts/week4_analyze.py --no-cache`
+recomputes everything (about 2–3 minutes) and prints a runtime summary and a sanity table against the course page.
+`scripts/week4_validate_browser.mjs` (`npm run validate:week4`) checks the page's in-browser computations
+(`src/js/week4_core.js`) against the JSON. `weeks/week4/week4_gonuts.ipynb` holds the exploration and validation cells.
+
 ## Running locally
 
-Requirements: Python 3 with `pandas`, `networkx`, `numpy`, `scipy`, and `matplotlib`, and
-any static file server.
+Requirements: Python 3 with `pandas`, `networkx` (≥ 3.4, for `forceatlas2_layout`), `numpy`, `scipy`,
+`matplotlib`, `scikit-learn` and `infomap` (Week 4), Node (for `validate:week4`), and any static file server.
 
 ```bash
 # 1. Regenerate the analyses from the raw dataset
 npm run analyze          # Week 1 -> data/processed/analysis.json
 npm run analyze:week3    # Week 3 -> data/processed/week3.json + weeks/week3/figures/
+npm run analyze:week4    # Week 4 -> data/processed/week4.json + weeks/week4/figures/
+npm run validate:week4   # Week 4 in-browser computations vs the Python output
 
 # 2. Serve the site locally (any static server works)
 npm start
@@ -88,8 +115,10 @@ weeks/
   week1.html                  # Week 1 — Marvel Network Explorer
   week2.html                  # Week 2 — The Friendship Paradox
   week3.html                  # Week 3 — Who Holds the Marvel Universe Together?
+  week4.html                  # Week 4 — Solid Cores, Moving Borders (philosophers)
   week2/                      # week2_gonuts.ipynb, week2_gonuts.md, figures/*.png
   week3/                      # week3_gonuts.ipynb, week3_gonuts.md, figures/*.png
+  week4/                      # week4_gonuts.ipynb, week4_gonuts.md, figures/*.png
 week2.html                    # redirect stub -> weeks/week2.html (old links)
 src/css/styles.css            # shared dark/comic visual design system
 src/js/
@@ -97,10 +126,15 @@ src/js/
   hub.js                      # renders the hub's card grid from weeks.js
   weeknav.js                  # shared chrome on every week page (hub link, switcher, prev/next)
   data.js, main.js, charts.js, network.js, hero.js, experiments.js   # Week 1 dashboard
-data/raw/                     # frozen Week 1 node roster + edge list (input to every pipeline)
-data/processed/               # analysis.json (Week 1), week3.json (Week 3)
+  week3.js                    # Week 3 page
+  week4.js, week4_core.js     # Week 4 page; week4_core.js = pure computations shared with the Node validator
+data/raw/                     # frozen course snapshots (Marvel weeks 1 + 4, philosophers week 4) + Wikidata caches
+data/processed/               # analysis.json (Week 1), week3.json (Week 3), week4.json (Week 4)
 scripts/analyze.py            # Week 1 pipeline ("npm run analyze")
 scripts/week3_analyze.py      # Week 3 pipeline ("npm run analyze:week3")
+scripts/week4_analyze.py      # Week 4 pipeline ("npm run analyze:week4")
+scripts/netlib.py             # shared loaders, nulls, NMI, modularity, partition helpers
+scripts/week4_validate_browser.mjs   # "npm run validate:week4"
 ```
 
 ### Adding a new week

@@ -38,7 +38,11 @@ export const WEEKS = [
   {
     n: 4,
     courseTitle: "Communities & backbones",
-    status: "coming",
+    title: "Solid Cores, Moving Borders",
+    teaser: "Where are the borders of philosophy? Ten Louvain seeds, Infomap, overlapping communities and a disparity backbone agree on the cores and argue about the borders.",
+    status: "live",
+    href: "weeks/week4.html",
+    course: "https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html",
   },
   {
     n: 5,

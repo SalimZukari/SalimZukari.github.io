@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Week 4: Solid Cores, Moving Borders — Social Graphs Group Site</title>
+  <meta name="description" content="Communities, overlap, weights and backbones on the Wikipedia philosophers network: how much does a community border move when you change the decision that drew it?" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../src/css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="site-nav" aria-label="Section navigation">
+    <div class="container">
+      <a href="#top" class="brand">PHILOSOPHY<span class="dot">•</span>BORDERS</a>
+      <button class="btn btn-ghost nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links">☰ Menu</button>
+      <div class="nav-links" id="nav-links">
+        <a href="#hook">Hook</a>
+        <a href="#nulls">Compared to what</a>
+        <a href="#stability">Stability</a>
+        <a href="#infomap">Louvain vs Infomap</a>
+        <a href="#aristotle">Aristotle</a>
+        <a href="#backbone">Backbone</a>
+        <a href="#weights">Weights</a>
+        <a href="#finder">Find a philosopher</a>
+        <a href="#llm">Grading an LLM</a>
+        <a href="#conclusions">Conclusions</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div id="load-status" class="container"></div>
+
+    <div id="app" hidden>
+      <div class="container" style="padding-top:50px" id="top">
+        <span class="section-kicker">Week 4 · Communities &amp; backbones · Where are the borders of philosophy?</span>
+        <h1 class="section-title" style="font-size:clamp(2rem,5vw,3rem)">Solid cores, moving borders</h1>
+        <div class="post-meta">
+          <a class="badge" href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#go-nuts" target="_blank" rel="noopener">Exercise 4.13 — Go nuts with your LLM ↗</a>
+          <a class="badge" href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html" target="_blank" rel="noopener">Course page ↗</a>
+          <a class="badge" href="week4/week4_gonuts.ipynb">Notebook ↗</a>
+          <a class="badge" href="week4/week4_gonuts.md">Write-up ↗</a>
+        </div>
+        <p class="section-lede">
+          A community boundary is a decision, not a fact. Pick an algorithm, a seed, a resolution, a
+          <em>k</em>, an α, and a border appears between two philosophers. This post changes each of those
+          decisions in turn on the Wikipedia philosophers network and asks which borders survive every one
+          of them, which ones move, and who lives on them.
+        </p>
+
+        <div class="story-grid" style="margin-bottom:10px">
+          <div class="story-card"><h3>What we asked</h3><p id="wk4-asked"></p></div>
+          <div class="story-card"><h3>What we did</h3><p id="wk4-did"></p></div>
+          <div class="story-card"><h3>What we found</h3><p id="wk4-found"></p></div>
+          <div class="story-card"><h3>What surprised us</h3><p id="wk4-surprised"></p></div>
+        </div>
+        <p class="w4-lede-note" id="wk4-graphnote"></p>
+      </div>
+
+      <!-- 1. HOOK -->
+      <section id="hook">
+        <div class="container">
+          <span class="section-kicker">1 · The hook</span>
+          <h2 class="section-title">Run Louvain once, and philosophy sorts itself. Run it again.</h2>
+          <p class="section-lede" id="hook-lede"></p>
+          <div class="chart-wrap">
+            <div class="w4-controls" role="group" aria-label="Choose which Louvain run to colour the network by" id="hook-buttons"></div>
+            <div class="w4-canvas-wrap" id="hook-canvas" role="img" aria-label="The philosophers' giant component drawn at fixed positions, each philosopher coloured by the community one Louvain run assigns them to. Use the buttons above to switch runs; the readout below describes each run."></div>
+            <p class="w4-readout" id="hook-readout" aria-live="polite"></p>
+            <div class="w4-legend" id="hook-legend"></div>
+            <p class="chart-caption" id="hook-caption"></p>
+          </div>
+          <p class="section-lede" style="margin-top:20px" id="hook-honest"></p>
+          <div class="callout">
+            <strong>About the names.</strong> Every community on this page is named after its highest-degree member
+            ("Aristotle's community"). That's a label we attach to a partition, not a finding about philosophy.
+            Any story about why these philosophers belong together is one we'd be constructing afterwards.
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. NULLS -->
+      <section id="nulls">
+        <div class="container">
+          <span class="section-kicker">2 · Is there anything there at all?</span>
+          <h2 class="section-title">Modularity, compared to what?</h2>
+          <p class="section-lede" id="nulls-lede"></p>
+          <div class="chart-wrap">
+            <div class="w4-legend" id="nulls-toggles" role="group" aria-label="Show or hide null models"></div>
+            <div id="nulls-chart" class="w4-svg" role="img" aria-label="Dot plot of Louvain modularity for the real networks against three null models, philosophers on top and Marvel below. The real network's range over ten seeds is a shaded band."></div>
+            <p class="w4-readout" id="nulls-readout" aria-live="polite">Hover or focus a dot to read its value.</p>
+            <p class="chart-caption" id="nulls-caption"></p>
+          </div>
+          <div class="w4-stats" id="nulls-stats"></div>
+          <div class="w4-two" style="margin-top:22px">
+            <div>
+              <h3>Why the degree-preserving null?</h3>
+              <p class="section-lede" style="font-size:1rem">
+                Modularity already subtracts what the degrees predict, but an optimiser that searches an
+                astronomically large space of partitions will always find <em>some</em> border that looks better
+                than chance. The question is whether our network does better than a network with the same degree
+                sequence and nothing else. A G(n, m) graph also scrambles the degrees, so it answers a question
+                nobody asked: it can't separate "the hubs make it look grouped" from "it is grouped."
+              </p>
+            </div>
+            <div>
+              <h3>Why isn't a random network's Q zero?</h3>
+              <p class="section-lede" style="font-size:1rem" id="nulls-why-nonzero"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. STABILITY -->
+      <section id="stability">
+        <div class="container">
+          <span class="section-kicker">3 · How stable is it?</span>
+          <h2 class="section-title">Ten seeds, one landscape full of near-ties</h2>
+          <p class="section-lede" id="stab-lede"></p>
+          <div class="chart-wrap">
+            <div class="w4-controls" role="group" aria-label="Choose network" id="nmi-toggle"></div>
+            <div id="nmi-chart" class="w4-svg" role="img" aria-label="Heatmap of normalized mutual information between every pair of ten Louvain runs. Use Tab to move between cells; the readout below gives each pair's value."></div>
+            <p class="w4-readout" id="nmi-readout" aria-live="polite"></p>
+            <p class="chart-caption" id="nmi-caption"></p>
+          </div>
+          <h3 style="margin-top:28px">A consensus, and who lives on the borders</h3>
+          <p class="section-lede" id="stab-consensus"></p>
+          <div id="stab-pairs" style="margin:10px 0 16px"></div>
+          <div class="w4-table-wrap" id="stab-table"></div>
+          <p class="section-lede" style="margin-top:16px" id="stab-border-text"></p>
+        </div>
+      </section>
+
+      <!-- 4. INFOMAP -->
+      <section id="infomap">
+        <div class="container">
+          <span class="section-kicker">4 · Two algorithms, two histories</span>
+          <h2 class="section-title">Louvain vs Infomap: where do they draw different borders?</h2>
+          <p class="section-lede" id="im-lede"></p>
+          <div class="w4-stats" id="im-stats"></div>
+          <div class="chart-wrap" style="margin-top:18px">
+            <h3 style="margin-top:0">The disagreement, as one figure</h3>
+            <div id="im-matrix" class="w4-svg" role="img" aria-label="Contingency heatmap: rows are Louvain consensus communities, columns are Infomap modules; each cell counts the philosophers the two assign to that pair. Tab through the cells to read them."></div>
+            <p class="w4-readout" id="im-matrix-readout" aria-live="polite">Hover, focus or tap a cell to see who is in it.</p>
+            <div class="w4-controls" role="group" aria-label="Choose which disagreement to highlight on the network" id="im-buttons" style="margin-top:16px"></div>
+            <div class="w4-canvas-wrap" id="im-canvas" role="img" aria-label="The giant component at fixed positions, with the philosophers the two methods disagree about highlighted; the rest are faded."></div>
+            <p class="w4-readout" id="im-canvas-readout" aria-live="polite"></p>
+            <p class="chart-caption" id="im-caption"></p>
+          </div>
+          <h3 style="margin-top:28px">Why they disagree, in network terms</h3>
+          <div class="post-body" id="im-why"></div>
+          <div class="w4-table-wrap" id="im-history" style="margin-top:14px"></div>
+          <p class="section-lede" style="margin-top:14px" id="im-verdict"></p>
+        </div>
+      </section>
+
+      <!-- 5. ARISTOTLE -->
+      <section id="aristotle">
+        <div class="container">
+          <span class="section-kicker">5 · Overlap</span>
+          <h2 class="section-title">Which tradition is Aristotle <em>really</em> in?</h2>
+          <p class="section-lede" id="ar-lede"></p>
+          <div class="chart-wrap">
+            <div class="w4-controls" role="group" aria-label="Colour Aristotle's links by" id="ar-buttons"></div>
+            <div id="ar-chart" class="w4-svg" role="img" aria-label="Aristotle at the centre with his links as spokes. Colour shows either the link community each link belongs to or the Louvain community of the philosopher at the other end. The legend and readout list the counts."></div>
+            <p class="w4-readout" id="ar-readout" aria-live="polite">Hover or tap a spoke to see the link.</p>
+            <div class="w4-legend" id="ar-legend"></div>
+            <p class="chart-caption" id="ar-caption"></p>
+          </div>
+          <div class="post-body" id="ar-argument" style="margin-top:20px"></div>
+          <h3 style="margin-top:26px">k-clique communities: the <em>k</em> is a choice</h3>
+          <div class="w4-table-wrap" id="kc-table"></div>
+          <p class="section-lede" style="margin-top:12px" id="kc-text"></p>
+          <h3 style="margin-top:26px">A handful of others</h3>
+          <div class="w4-table-wrap" id="ar-handful"></div>
+          <h3 style="margin-top:26px">Bridges vs hubs: communities per link</h3>
+          <p class="section-lede" id="lc-ratio-text"></p>
+          <div class="w4-two" id="lc-lists"></div>
+          <div class="callout w4-caveat" id="lc-limit"></div>
+        </div>
+      </section>
+
+      <!-- 6. BACKBONE -->
+      <section id="backbone">
+        <div class="container">
+          <span class="section-kicker">6 · Strip it to the backbone</span>
+          <h2 class="section-title">Drag α and watch the giant component come apart</h2>
+          <p class="section-lede" id="bb-lede"></p>
+          <figure class="post-figure">
+            <img src="week4/figures/fig8_strength_vs_degree.png" alt="Log-log scatter of strength against degree for every philosopher in the giant component, with a dashed fit line. Aristotle is top right; a few philosophers sit well above the line, meaning their links repeat many times." loading="lazy" />
+            <figcaption id="fig8-caption"></figcaption>
+          </figure>
+          <h3>The disparity filter, from the formula</h3>
+          <div class="post-body" id="bb-formula"></div>
+          <div class="w4-table-wrap" id="bb-table"></div>
+          <p class="section-lede" style="margin-top:14px" id="bb-vs"></p>
+
+          <div class="chart-wrap" style="margin-top:22px">
+            <h3 style="margin-top:0">The α sweep</h3>
+            <div class="w4-legend" id="sweep-toggles" role="group" aria-label="Show or hide sweep series"></div>
+            <div id="sweep-chart" class="w4-svg" role="img" aria-label="Line chart against the disparity-filter level alpha from 0 to 0.5: share of philosophers attached, giant component, second-largest component and links kept. A dotted line marks where the giant component breaks; small markers mark the single links whose loss detaches a whole group."></div>
+            <p class="w4-readout" id="sweep-readout" aria-live="polite">Hover or tap the chart, or use the backbone explorer below, to read values at a given α.</p>
+            <p class="chart-caption" id="sweep-caption"></p>
+          </div>
+          <div class="post-body" id="bb-break" style="margin-top:18px"></div>
+          <div class="w4-table-wrap" id="bb-hinges" style="margin-top:10px"></div>
+
+          <div class="chart-wrap" style="margin-top:22px" id="explorer">
+            <h3 style="margin-top:0">Backbone explorer</h3>
+            <div class="w4-controls" role="radiogroup" aria-label="Filter">
+              <button class="btn" id="ex-mode-alpha" role="radio" aria-checked="true" aria-pressed="true">Disparity filter α</button>
+              <button class="btn" id="ex-mode-thr" role="radio" aria-checked="false" aria-pressed="false">Global threshold w ≥ θ</button>
+              <button class="btn" id="ex-break">Jump to the break</button>
+            </div>
+            <div class="w4-slider-row">
+              <label id="ex-alpha-wrap">α <input class="w4-range" type="range" id="ex-alpha" min="0.005" max="0.5" step="0.001" value="0.2" list="ex-alpha-marks" aria-describedby="ex-readout" /> <output id="ex-alpha-out" for="ex-alpha">0.200</output></label>
+              <datalist id="ex-alpha-marks"></datalist>
+              <label id="ex-thr-wrap" hidden>θ <input class="w4-range" type="range" id="ex-thr" min="1" max="10" step="1" value="3" aria-describedby="ex-readout" /> <output id="ex-thr-out" for="ex-thr">3</output></label>
+            </div>
+            <div class="w4-slider-row" style="margin-top:8px">
+              <div class="sixdeg-search network-search" style="max-width:360px">
+                <input type="text" id="ex-search" placeholder="Highlight a philosopher…" aria-label="Highlight a philosopher in the backbone explorer" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ex-suggestions" aria-autocomplete="list" />
+                <div class="search-suggestions" id="ex-suggestions" role="listbox" hidden></div>
+              </div>
+            </div>
+            <div class="w4-stats" id="ex-stats" aria-live="polite"></div>
+            <div class="w4-canvas-wrap" id="ex-canvas" role="img" aria-label="The backbone network at the chosen filter setting: kept links drawn, philosophers coloured by consensus community and sized by strength, detached philosophers faded. Hover a philosopher, or pick one with the search box, to list their surviving and dropped ties."></div>
+            <p class="w4-readout" id="ex-readout" aria-live="polite"></p>
+            <div class="w4-legend" id="ex-legend"></div>
+            <p class="chart-caption" id="ex-caption"></p>
+          </div>
+
+          <figure class="post-figure">
+            <img src="week4/figures/fig6_backbone_three_alphas.png" alt="Three panels of the same backbone layout at alpha 0.2, 0.1 and 0.05. As alpha falls, links disappear and the giant component shrinks from most of the network to a small core; colours are consensus Louvain communities." loading="lazy" />
+            <figcaption id="fig6-caption"></figcaption>
+          </figure>
+          <figure class="post-figure">
+            <img src="week4/figures/fig7_backbone_alpha_0.2.png" alt="The alpha 0.2 disparity backbone, drawn by the five rules: ForceAtlas2 layout of the backbone's giant component with its small components on a shelf below, colours for the eight consensus communities, node size by strength, the ten strongest philosophers labelled. Greek and scholastic philosophy sit at the top, German and early-modern in the middle, the Chinese community hangs off below by a thin chain." loading="lazy" />
+            <figcaption id="fig7-caption"></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- 7. WEIGHTS -->
+      <section id="weights">
+        <div class="container">
+          <span class="section-kicker">7 · Weighted vs unweighted</span>
+          <h2 class="section-title">Does the weighted network tell a different story?</h2>
+          <p class="section-lede" id="w-lede"></p>
+          <div class="w4-stats" id="w-stats"></div>
+          <div class="callout w4-caveat" id="w-warning"></div>
+          <p class="section-lede" id="w-movers-text"></p>
+          <div id="w-movers"></div>
+        </div>
+      </section>
+
+      <!-- 8. FINDER -->
+      <section id="finder">
+        <div class="container">
+          <span class="section-kicker">Find a philosopher</span>
+          <h2 class="section-title">Where does your philosopher land?</h2>
+          <p class="section-lede">
+            Type a name to see every border this post drew around them: their community in each of the ten
+            Louvain runs, the consensus, Infomap, the link and k-clique communities they belong to, and their
+            strongest ties.
+          </p>
+          <div class="sixdeg-search network-search" style="max-width:480px">
+            <input type="text" id="finder-input" placeholder="Search a philosopher…" aria-label="Search a philosopher" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="finder-suggestions" aria-autocomplete="list" />
+            <div class="search-suggestions" id="finder-suggestions" role="listbox" hidden></div>
+          </div>
+          <div id="finder-card" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <!-- 9. LLM -->
+      <section id="llm">
+        <div class="container">
+          <span class="section-kicker">Grading an LLM</span>
+          <h2 class="section-title">What an LLM got wrong about the communities of philosophy</h2>
+          <p class="section-lede" id="llm-intro"></p>
+          <p class="llm-paragraph" id="llm-paragraph"></p>
+          <div id="llm-claims"></div>
+        </div>
+      </section>
+
+      <!-- 10. CONCLUSIONS -->
+      <section id="conclusions">
+        <div class="container">
+          <span class="section-kicker">What we can and can't conclude</span>
+          <h2 class="section-title">Limits, and the bottom line</h2>
+          <div class="post-body" id="concl-body"></div>
+          <div class="callout">
+            <strong>Where Peixoto would push back.</strong> Everything here is descriptive: we found partitions that
+            score well and checked them against nulls and against each other, but we never asked what process
+            generated the links. That's an inferential question, and Peixoto's
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#peixoto" target="_blank" rel="noopener">critique</a>
+            is that modularity plus an afterwards null can't answer it. With another week we'd fit a (nested,
+            degree-corrected) stochastic block model by Bayesian inference in graph-tool, compare its posterior
+            over partitions with our consensus, and check whether it finds one block on the shuffled networks.
+          </div>
+          <details class="chart-summary" style="margin-top:18px">
+            <summary>Sanity checks: our numbers vs the course page</summary>
+            <div class="w4-table-wrap" id="sanity-table" style="margin-top:10px"></div>
+          </details>
+          <details class="chart-summary">
+            <summary>Validation of our own code</summary>
+            <div class="post-body" id="validation-text" style="margin-top:10px"></div>
+          </details>
+          <p class="section-lede" style="margin-top:18px">
+            Full exercise: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#go-nuts" target="_blank" rel="noopener">exercise 4.13 on the course page</a>.
+            We built on the course's explorables for
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#louvain" target="_blank" rel="noopener">Louvain</a>,
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#cliques" target="_blank" rel="noopener">k-cliques</a>,
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#link-communities" target="_blank" rel="noopener">link communities</a> and the
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#backbones" target="_blank" rel="noopener">backbone</a>, and on the Goodies boxes on
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#infomap" target="_blank" rel="noopener">Infomap</a>,
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#resolution" target="_blank" rel="noopener">the resolution limit</a> and
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html#adaptive-cut" target="_blank" rel="noopener">the adaptive cut</a>.
+          </p>
+          <p class="chart-caption" id="wk4-meta"></p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Built for the <strong>Social Graphs / Network Science</strong> course — Week 4 group exercise.</p>
+      <p>
+        Course exercise: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week4.html" target="_blank" rel="noopener">Week 4 page</a> ·
+        Notebook: <a href="week4/week4_gonuts.ipynb">week4_gonuts.ipynb</a> ·
+        Data: <a href="https://sunelehmann.com/socialgraphs2026-web/data/" target="_blank" rel="noopener">course data page</a>
+      </p>
+      <p>Philosopher data and descriptions come from Wikipedia via the course dataset. All visual design is original.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script type="module" src="../src/js/week4.js"></script>
+  <script type="module">
+    import { initWeekNav } from "../src/js/weeknav.js";
+
+    const toggle = document.getElementById("nav-toggle");
+    const links = document.getElementById("nav-links");
+    toggle.addEventListener("click", () => {
+      const open = links.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+    links.querySelectorAll("a").forEach((a) =>
+      a.addEventListener("click", () => {
+        links.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      })
+    );
+
+    initWeekNav(4);
+  </script>
+</body>
+</html>

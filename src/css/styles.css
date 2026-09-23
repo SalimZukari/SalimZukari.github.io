@@ -773,6 +773,18 @@ footer a { color: var(--accent-2); }
 @media (max-width: 860px) {
   .weeknav-bar { border-right: none; margin-right: 0; padding-right: 0; }
 }
+/* Phones: the brand, the week switcher and the menu button don't fit on one
+   row, so the switcher wraps to a second row instead of scrolling the page
+   sideways. The dropdown menu hangs from the bottom of the bar either way. */
+@media (max-width: 560px) {
+  .site-nav .container { flex-wrap: wrap; height: auto; padding-top: 8px; padding-bottom: 8px; row-gap: 6px; }
+  .site-nav .brand { order: 1; font-size: 1rem; }
+  .site-nav .nav-toggle { order: 2; margin-left: auto; }
+  .weeknav-bar { order: 3; flex-basis: 100%; min-width: 0; }
+  .weeknav-switch { min-width: 0; flex: 1; }
+  .weeknav-switch select#weeknav-select { max-width: 100%; width: 100%; }
+  .nav-links { top: 100%; }
+}
 
 .weeknav-prevnext {
   display: flex;
@@ -1070,3 +1082,58 @@ a.week-card:hover, a.week-card:focus-visible {
 .scatter-pinned strong { color: var(--text); }
 .scatter-pinned .z-pos { color: var(--accent-2); }
 .scatter-pinned .z-neg { color: var(--accent); }
+
+/* ---------- Week 4: communities & backbones ---------- */
+.w4-lede-note { color: var(--text-faint); font-size: 0.85rem; max-width: 74ch; }
+.w4-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.w4-controls .btn { padding: 7px 13px; font-size: 0.82rem; }
+.w4-controls .btn[aria-pressed="true"] { background: var(--accent-2); color: #06202a; border-color: var(--accent-2); }
+.w4-controls label { font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 8px; }
+.w4-canvas-wrap { position: relative; width: 100%; background: #0b1020; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; touch-action: manipulation; }
+.w4-canvas-wrap canvas { display: block; width: 100%; }
+.w4-readout {
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 10px 14px; margin-top: 10px; font-size: 0.88rem; color: var(--text-dim); min-height: 1.4em;
+}
+.w4-readout strong { color: var(--text); }
+.w4-readout .kept { color: var(--ok); }
+.w4-readout .dropped { color: var(--accent); text-decoration: line-through; }
+.w4-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; }
+.w4-legend .legend-chip { margin-right: 0; }
+.w4-legend button.legend-chip { background: none; border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; cursor: pointer; color: var(--text-dim); }
+.w4-legend button.legend-chip[aria-pressed="false"] { opacity: 0.4; }
+.w4-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+.w4-stat { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
+.w4-stat .v { font-family: var(--font-display); font-size: 1.5rem; color: var(--accent-3); display: block; letter-spacing: 0.5px; }
+.w4-stat .l { font-size: 0.76rem; color: var(--text-faint); }
+.w4-range { width: min(420px, 100%); accent-color: var(--accent-2); }
+.w4-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 860px) { .w4-two { grid-template-columns: 1fr; } }
+.w4-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.w4-table-wrap .data-table { min-width: 520px; }
+.w4-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; font-size: 0.78rem; margin: 2px 4px 2px 0; color: var(--text); }
+.w4-chip .legend-swatch { flex: none; }
+.w4-runs { display: flex; flex-wrap: wrap; gap: 4px; }
+.w4-run { width: 26px; height: 26px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #0b1020; font-weight: 800; border: 1px solid rgba(255,255,255,0.15); }
+.finder-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-top: 14px; }
+.finder-card h3 { margin: 0 0 4px; font-family: var(--font-display); letter-spacing: 0.5px; font-size: 1.6rem; color: var(--accent-3); }
+.finder-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 12px; }
+@media (max-width: 760px) { .finder-grid { grid-template-columns: 1fr; } }
+.finder-grid h4 { margin: 0 0 6px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-faint); }
+.finder-grid p, .finder-grid li { font-size: 0.88rem; color: var(--text-dim); margin: 2px 0; }
+.finder-grid ul { padding-left: 18px; margin: 0; }
+.search-suggestions button[aria-selected="true"] { background: var(--panel-2); }
+.w4-svg text { fill: var(--text-dim); font-size: 11px; }
+.w4-svg .axis text { fill: var(--text-faint); }
+.w4-svg .axis path, .w4-svg .axis line { stroke: var(--border); }
+.w4-svg .cell:focus { outline: none; stroke: var(--accent-3); stroke-width: 2px; }
+.w4-svg .grid line { stroke: var(--border); stroke-opacity: 0.5; }
+.w4-figure-note { font-size: 0.8rem; color: var(--text-faint); margin-top: 6px; }
+section .post-figure { max-width: 100%; }
+.w4-slider-row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.w4-slider-row output { font-variant-numeric: tabular-nums; color: var(--accent-3); font-weight: 700; min-width: 4ch; display: inline-block; }
+.w4-caveat { border-left-color: var(--accent); }
+@media (max-width: 640px) {
+  .w4-stat .v { font-size: 1.25rem; }
+  .finder-card h3 { font-size: 1.35rem; }
+}

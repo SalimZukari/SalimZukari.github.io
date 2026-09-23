@@ -1,0 +1,1096 @@
+{
+ "property": "P135",
+ "note": "Wikidata movement labels for the philosophers roster, via the SPARQL endpoint",
+ "fetchedAt": "2026-09-23",
+ "movements": {
+  "Q868": [
+   "peripatetic school"
+  ],
+  "Q7104": [
+   "atheism",
+   "materialism"
+  ],
+  "Q12718": [
+   "positivism"
+  ],
+  "Q33760": [
+   "analytic philosophy",
+   "freethought",
+   "Western philosophy"
+  ],
+  "Q35802": [
+   "rationalism",
+   "Western philosophy"
+  ],
+  "Q38193": [
+   "irrationalism"
+  ],
+  "Q39837": [
+   "aristotelianism",
+   "Averroism"
+  ],
+  "Q42458": [
+   "Pre-Socratic philosophy",
+   "Milesian school"
+  ],
+  "Q73527": [
+   "Platonism"
+  ],
+  "Q76878": [
+   "atheism"
+  ],
+  "Q80612": [
+   "Pre-Socratic philosophy",
+   "Milesian school"
+  ],
+  "Q83003": [
+   "Marxist humanism",
+   "continental philosophy",
+   "Western Marxism",
+   "Neo-Marxism"
+  ],
+  "Q83041": [
+   "Pre-Socratic philosophy",
+   "Pluralist school"
+  ],
+  "Q123089": [
+   "liberalism",
+   "Romanticism"
+  ],
+  "Q170512": [
+   "Middle Platonism"
+  ],
+  "Q179149": [
+   "Cynicism"
+  ],
+  "Q180967": [
+   "Bhakti movement"
+  ],
+  "Q183094": [
+   "Scottish Enlightenment",
+   "Scottish Common Sense Realism"
+  ],
+  "Q188332": [
+   "Pre-Socratic philosophy",
+   "Pythagoreanism"
+  ],
+  "Q189506": [
+   "Cyrenaics"
+  ],
+  "Q192348": [
+   "Western philosophy"
+  ],
+  "Q202001": [
+   "Pre-Socratic philosophy",
+   "Pythagoreanism"
+  ],
+  "Q231690": [
+   "social movement",
+   "Dalit Buddhist movement",
+   "Indian independence movement"
+  ],
+  "Q277073": [
+   "antinatalism",
+   "skepticism"
+  ],
+  "Q297040": [
+   "neopythagoreanism"
+  ],
+  "Q310309": [
+   "Classicism"
+  ],
+  "Q314467": [
+   "pyrrhonism"
+  ],
+  "Q317146": [
+   "peripatetic school"
+  ],
+  "Q320042": [
+   "Platonism"
+  ],
+  "Q335560": [
+   "sophism",
+   "Pre-Socratic philosophy"
+  ],
+  "Q342730": [
+   "Marxism"
+  ],
+  "Q345277": [
+   "gnosticism"
+  ],
+  "Q352988": [
+   "peripatetic school"
+  ],
+  "Q366031": [
+   "Pre-Socratic philosophy",
+   "atomism"
+  ],
+  "Q380425": [
+   "Hovevei Zion",
+   "Cultural Zionism"
+  ],
+  "Q385790": [
+   "Kantianism"
+  ],
+  "Q395689": [
+   "Renaissance"
+  ],
+  "Q428694": [
+   "Modistae"
+  ],
+  "Q556865": [
+   "Cyrenaics"
+  ],
+  "Q646951": [
+   "stoicism"
+  ],
+  "Q1248105": [
+   "continental philosophy"
+  ],
+  "Q2120917": [
+   "Harlem Renaissance"
+  ],
+  "Q3518406": [
+   "Kannada literature"
+  ],
+  "Q448": [
+   "materialism",
+   "encyclopédistes",
+   "Enlightenment philosophy"
+  ],
+  "Q1067": [
+   "Dolce Stil Novo"
+  ],
+  "Q1541": [
+   "academic skepticism"
+  ],
+  "Q4604": [
+   "Confucianism"
+  ],
+  "Q9204": [
+   "Inklings"
+  ],
+  "Q37160": [
+   "Age of Enlightenment",
+   "naturalism",
+   "empiricism",
+   "philosophical skepticism"
+  ],
+  "Q37388": [
+   "empiricism"
+  ],
+  "Q41980": [
+   "atomism"
+  ],
+  "Q43216": [
+   "Epicureanism"
+  ],
+  "Q43499": [
+   "Renaissance philosophy"
+  ],
+  "Q57188": [
+   "Marburg School"
+  ],
+  "Q57240": [
+   "surrealism"
+  ],
+  "Q58586": [
+   "Western philosophy"
+  ],
+  "Q59137": [
+   "Epicureanism"
+  ],
+  "Q59180": [
+   "Cynicism"
+  ],
+  "Q75784": [
+   "democratic socialism"
+  ],
+  "Q76510": [
+   "rationalism"
+  ],
+  "Q76727": [
+   "Conservative Revolution"
+  ],
+  "Q77057": [
+   "irrationalism"
+  ],
+  "Q77148": [
+   "Western philosophy",
+   "Conservative Revolution"
+  ],
+  "Q83375": [
+   "Pre-Socratic philosophy",
+   "Pluralist school"
+  ],
+  "Q93996": [
+   "Western philosophy"
+  ],
+  "Q165792": [
+   "liberal conservatism",
+   "counter-revolutionary"
+  ],
+  "Q181707": [
+   "utopian socialism"
+  ],
+  "Q183144": [
+   "stoicism"
+  ],
+  "Q187520": [
+   "pragmatism"
+  ],
+  "Q190302": [
+   "atheism"
+  ],
+  "Q211411": [
+   "stoicism"
+  ],
+  "Q220856": [
+   "freethought",
+   "critical philosophy"
+  ],
+  "Q223723": [
+   "Romanticism in Italy"
+  ],
+  "Q284994": [
+   "Platonism"
+  ],
+  "Q310149": [
+   "stoicism"
+  ],
+  "Q312384": [
+   "School of Salamanca"
+  ],
+  "Q312410": [
+   "Old Comedy"
+  ],
+  "Q312682": [
+   "Megarian school"
+  ],
+  "Q315360": [
+   "Neoplatonism"
+  ],
+  "Q315370": [
+   "Q9251836"
+  ],
+  "Q316339": [
+   "School of Salamanca"
+  ],
+  "Q317947": [
+   "Cynicism"
+  ],
+  "Q353264": [
+   "atheism",
+   "sophism"
+  ],
+  "Q434773": [
+   "Platonism"
+  ],
+  "Q445626": [
+   "Chinese philosophy"
+  ],
+  "Q461007": [
+   "Megarian school"
+  ],
+  "Q466951": [
+   "Platonism"
+  ],
+  "Q468097": [
+   "neothomism"
+  ],
+  "Q554387": [
+   "Hellenistic art"
+  ],
+  "Q558192": [
+   "Neo-Confucianism",
+   "Cheng-Zhu school"
+  ],
+  "Q558380": [
+   "Cheng-Zhu school"
+  ],
+  "Q936308": [
+   "School of Padua"
+  ],
+  "Q1237514": [
+   "School of Salamanca"
+  ],
+  "Q2495593": [
+   "School of Names"
+  ],
+  "Q3020852": [
+   "Bengali Renaissance",
+   "Brahmo Samaj"
+  ],
+  "Q991": [
+   "literary realism"
+  ],
+  "Q9047": [
+   "rationalism"
+  ],
+  "Q9235": [
+   "historicism",
+   "German idealism",
+   "Hegelianism"
+  ],
+  "Q22670": [
+   "Sturm und Drang",
+   "Weimar Classicism"
+  ],
+  "Q36330": [
+   "Neoplatonism",
+   "renaissance humanism",
+   "neopythagoreanism"
+  ],
+  "Q41155": [
+   "Pre-Socratic philosophy",
+   "ancient philosophy",
+   "Western philosophy",
+   "Ionian School"
+  ],
+  "Q42156": [
+   "continental philosophy"
+  ],
+  "Q47667": [
+   "New Culture Movement",
+   "Q10264717"
+  ],
+  "Q60030": [
+   "Frankfurt School"
+  ],
+  "Q60070": [
+   "German idealism"
+  ],
+  "Q75889": [
+   "Romanticism",
+   "German idealism"
+  ],
+  "Q76518": [
+   "materialism",
+   "fictionalism",
+   "as if"
+  ],
+  "Q76568": [
+   "German Renaissance"
+  ],
+  "Q76576": [
+   "German idealism"
+  ],
+  "Q76709": [
+   "Western philosophy",
+   "Marburg School"
+  ],
+  "Q76849": [
+   "Neo-Kantianism"
+  ],
+  "Q82049": [
+   "empiricism",
+   "immaterialism"
+  ],
+  "Q82934": [
+   "utopian socialism"
+  ],
+  "Q123041": [
+   "Romanticism in France"
+  ],
+  "Q123916": [
+   "German idealism"
+  ],
+  "Q131018": [
+   "freethought",
+   "renaissance humanism"
+  ],
+  "Q131149": [
+   "Western philosophy"
+  ],
+  "Q131333": [
+   "literary realism"
+  ],
+  "Q144535": [
+   "positivism",
+   "utilitarianism",
+   "freethought"
+  ],
+  "Q154145": [
+   "Christian existentialism"
+  ],
+  "Q157271": [
+   "Romanticism",
+   "German Romanticism",
+   "Romantic literature"
+  ],
+  "Q179785": [
+   "sophism",
+   "Pre-Socratic philosophy",
+   "sophist"
+  ],
+  "Q182128": [
+   "Renaissance"
+  ],
+  "Q207359": [
+   "continental philosophy",
+   "irrationalism"
+  ],
+  "Q210573": [
+   "sophism",
+   "Pre-Socratic philosophy"
+  ],
+  "Q235494": [
+   "Cynicism"
+  ],
+  "Q270800": [
+   "historical epistemology"
+  ],
+  "Q297726": [
+   "positivism"
+  ],
+  "Q298860": [
+   "Pre-Socratic philosophy",
+   "Pythagoreanism"
+  ],
+  "Q312295": [
+   "Hegelianism"
+  ],
+  "Q316334": [
+   "Platonism"
+  ],
+  "Q336803": [
+   "religious philosophy"
+  ],
+  "Q367240": [
+   "Toledo School of Translators"
+  ],
+  "Q379987": [
+   "stoicism"
+  ],
+  "Q381874": [
+   "stoicism"
+  ],
+  "Q517177": [
+   "Western philosophy"
+  ],
+  "Q533514": [
+   "humanism"
+  ],
+  "Q612787": [
+   "Pythagoreanism"
+  ],
+  "Q655390": [
+   "Q20043954"
+  ],
+  "Q707637": [
+   "scholasticism"
+  ],
+  "Q857017": [
+   "stoicism"
+  ],
+  "Q924215": [
+   "stoicism"
+  ],
+  "Q963339": [
+   "School of Salamanca"
+  ],
+  "Q302": [
+   "apocalypticism"
+  ],
+  "Q5879": [
+   "Age of Enlightenment",
+   "Sturm und Drang",
+   "Weimar Classicism"
+  ],
+  "Q6527": [
+   "Baroque music",
+   "Enlightenment philosophy"
+  ],
+  "Q7068": [
+   "atheism",
+   "materialism"
+  ],
+  "Q9312": [
+   "Age of Enlightenment",
+   "German idealism"
+  ],
+  "Q9317": [
+   "Bloomsbury Group"
+  ],
+  "Q9353": [
+   "empiricism"
+  ],
+  "Q11903": [
+   "Neoplatonism"
+  ],
+  "Q45723": [
+   "human rights",
+   "Christian democracy",
+   "Christian humanism",
+   "Q6073011"
+  ],
+  "Q50020": [
+   "liberalism",
+   "atheism",
+   "utilitarianism",
+   "egalitarianism"
+  ],
+  "Q60887": [
+   "utilitarianism"
+  ],
+  "Q76499": [
+   "Sturm und Drang"
+  ],
+  "Q102585": [
+   "German idealism",
+   "German Romanticism"
+  ],
+  "Q153020": [
+   "Noucentisme"
+  ],
+  "Q153232": [
+   "Enlightenment philosophy"
+  ],
+  "Q155547": [
+   "Age of Enlightenment",
+   "romantic nationalism"
+  ],
+  "Q271666": [
+   "liberalism"
+  ],
+  "Q275500": [
+   "logic",
+   "nominalism"
+  ],
+  "Q310916": [
+   "Neoplatonism"
+  ],
+  "Q312551": [
+   "bhakti",
+   "Sant Mat",
+   "Bhakti movement"
+  ],
+  "Q313073": [
+   "First Great Awakening"
+  ],
+  "Q315871": [
+   "humanism",
+   "stoicism"
+  ],
+  "Q316357": [
+   "humanism"
+  ],
+  "Q334147": [
+   "individualism",
+   "neo-fascism",
+   "Conservative Revolution",
+   "Fascist mysticism",
+   "Traditionalist School"
+  ],
+  "Q463553": [
+   "British idealism"
+  ],
+  "Q471260": [
+   "Hegelianism"
+  ],
+  "Q553132": [
+   "idealism"
+  ],
+  "Q627941": [
+   "School of Padua"
+  ],
+  "Q640808": [
+   "kogaku"
+  ],
+  "Q1246390": [
+   "Scottish Common Sense Realism"
+  ],
+  "Q1399609": [
+   "atheist"
+  ],
+  "Q2303850": [
+   "Q3493570"
+  ],
+  "Q2637918": [
+   "Islamic philosophy"
+  ],
+  "Q3188736": [
+   "continental philosophy"
+  ],
+  "Q3296918": [
+   "naturalism",
+   "philosophical realism",
+   "Australian realism"
+  ],
+  "Q6265864": [
+   "scholasticism"
+  ],
+  "Q15457107": [
+   "Hinduism"
+  ],
+  "Q1001": [
+   "nonviolence"
+  ],
+  "Q1399": [
+   "High Renaissance"
+  ],
+  "Q1430": [
+   "stoicism"
+  ],
+  "Q5816": [
+   "Marxism–Leninism–Maoism"
+  ],
+  "Q7243": [
+   "literary realism"
+  ],
+  "Q9333": [
+   "Taoism",
+   "Eastern philosophy",
+   "Hundred Schools of Thought"
+  ],
+  "Q9391": [
+   "analytic philosophy"
+  ],
+  "Q9554": [
+   "Protestant Reformation",
+   "Protestantism",
+   "German Renaissance"
+  ],
+  "Q27645": [
+   "anarchism",
+   "atheism",
+   "Western philosophy",
+   "libertarian socialism"
+  ],
+  "Q33391": [
+   "Trotskyism"
+  ],
+  "Q45125": [
+   "Kyoto School"
+  ],
+  "Q47154": [
+   "atomism"
+  ],
+  "Q48301": [
+   "phenomenology",
+   "Lebensphilosophie",
+   "existential philosophy"
+  ],
+  "Q60684": [
+   "Romanticism",
+   "German Romanticism",
+   "Romantic literature"
+  ],
+  "Q62831": [
+   "atheism",
+   "freethought",
+   "scientific materialism"
+  ],
+  "Q76422": [
+   "atheism",
+   "German idealism"
+  ],
+  "Q76509": [
+   "continental philosophy"
+  ],
+  "Q76725": [
+   "individualism",
+   "solipsism",
+   "Ethical egoism",
+   "Young Hegelians",
+   "egoist anarchism"
+  ],
+  "Q76826": [
+   "Frankfurt School"
+  ],
+  "Q76997": [
+   "continental philosophy"
+  ],
+  "Q84423": [
+   "Western philosophy"
+  ],
+  "Q101638": [
+   "feminism"
+  ],
+  "Q112258": [
+   "German idealism"
+  ],
+  "Q123867": [
+   "Western philosophy"
+  ],
+  "Q154751": [
+   "German Renaissance"
+  ],
+  "Q165589": [
+   "materialism",
+   "Pre-Socratic philosophy",
+   "atomism"
+  ],
+  "Q182046": [
+   "Italian Renaissance"
+  ],
+  "Q184656": [
+   "existentialism",
+   "personalism",
+   "Russian religious philosophy"
+  ],
+  "Q185085": [
+   "Generation of '98"
+  ],
+  "Q185375": [
+   "Western philosophy"
+  ],
+  "Q201477": [
+   "Enlightenment philosophy"
+  ],
+  "Q203911": [
+   "Epicureanism",
+   "Platonism"
+  ],
+  "Q214115": [
+   "humanism"
+  ],
+  "Q233711": [
+   "Pre-Socratic philosophy",
+   "Eleatics"
+  ],
+  "Q235069": [
+   "Christian Science"
+  ],
+  "Q294109": [
+   "Neoplatonism"
+  ],
+  "Q302835": [
+   "Avicennism"
+  ],
+  "Q309818": [
+   "occasionalism"
+  ],
+  "Q313934": [
+   "Neoplatonism"
+  ],
+  "Q314189": [
+   "Western philosophy",
+   "Christian existentialism"
+  ],
+  "Q436077": [
+   "School of Salamanca"
+  ],
+  "Q507036": [
+   "stoicism"
+  ],
+  "Q539514": [
+   "Epicureanism"
+  ],
+  "Q553128": [
+   "scholasticism",
+   "pantheism"
+  ],
+  "Q707344": [
+   "neopythagoreanism"
+  ],
+  "Q770682": [
+   "Russian philosophy"
+  ],
+  "Q780259": [
+   "Epicureanism"
+  ],
+  "Q990589": [
+   "eretrian school"
+  ],
+  "Q3876500": [
+   "School of Padua"
+  ],
+  "Q859": [
+   "Platonism"
+  ],
+  "Q2054": [
+   "stoicism"
+  ],
+  "Q5752": [
+   "anarchism"
+  ],
+  "Q7241": [
+   "Bengali Renaissance"
+  ],
+  "Q9191": [
+   "rationalism"
+  ],
+  "Q10261": [
+   "Pythagoreanism",
+   "Western philosophy"
+  ],
+  "Q35900": [
+   "Persian literature",
+   "Islamic Golden Age",
+   "Iranian philosophy"
+  ],
+  "Q47695": [
+   "continental philosophy",
+   "German idealism"
+  ],
+  "Q48226": [
+   "Western philosophy"
+  ],
+  "Q57112": [
+   "Conservative Revolution"
+  ],
+  "Q62596": [
+   "positivism"
+  ],
+  "Q76504": [
+   "Marburg School"
+  ],
+  "Q76519": [
+   "logical positivism"
+  ],
+  "Q78484": [
+   "anthroposophy"
+  ],
+  "Q79177": [
+   "logical positivism",
+   "Vienna Circle"
+  ],
+  "Q125551": [
+   "Pre-Socratic philosophy",
+   "Eleatics"
+  ],
+  "Q162593": [
+   "Pelagianism"
+  ],
+  "Q169243": [
+   "sophism",
+   "Pre-Socratic philosophy"
+  ],
+  "Q171677": [
+   "scholasticism"
+  ],
+  "Q185770": [
+   "stoicism"
+  ],
+  "Q189597": [
+   "stoicism",
+   "Middle Platonism"
+  ],
+  "Q192313": [
+   "pyrrhonism"
+  ],
+  "Q212338": [
+   "Pythagoreanism"
+  ],
+  "Q214816": [
+   "skepticism"
+  ],
+  "Q236594": [
+   "pyrrhonism"
+  ],
+  "Q271809": [
+   "Neoplatonism"
+  ],
+  "Q297402": [
+   "sophism",
+   "Pre-Socratic philosophy"
+  ],
+  "Q297420": [
+   "stoicism"
+  ],
+  "Q311485": [
+   "Orphism"
+  ],
+  "Q313174": [
+   "School of Padua"
+  ],
+  "Q318787": [
+   "scholasticism",
+   "School of Padua"
+  ],
+  "Q337628": [
+   "Russian philosophy"
+  ],
+  "Q365110": [
+   "Platonism"
+  ],
+  "Q451550": [
+   "Epicureanism"
+  ],
+  "Q463846": [
+   "humanism"
+  ],
+  "Q527384": [
+   "Vedic period"
+  ],
+  "Q740432": [
+   "Epicureanism"
+  ],
+  "Q768555": [
+   "classical music"
+  ],
+  "Q981459": [
+   "positivism"
+  ],
+  "Q981959": [
+   "Russian religious philosophy"
+  ],
+  "Q1741798": [
+   "Bhakti movement"
+  ],
+  "Q1803058": [
+   "positivism"
+  ],
+  "Q2064265": [
+   "School of Padua"
+  ],
+  "Q2609522": [
+   "Carolingian Renaissance"
+  ],
+  "Q1394": [
+   "Marxism",
+   "anti-capitalism",
+   "anti-imperialism",
+   "class struggle"
+  ],
+  "Q6512": [
+   "existentialism"
+  ],
+  "Q9068": [
+   "Age of Enlightenment",
+   "freethought",
+   "deism"
+  ],
+  "Q9438": [
+   "scholasticism",
+   "Thomism",
+   "just war theory"
+  ],
+  "Q9441": [
+   "nirvana",
+   "dharma",
+   "Noble Eightfold Path"
+  ],
+  "Q11031": [
+   "School of Lausanne"
+  ],
+  "Q36303": [
+   "Pre-Socratic philosophy",
+   "Milesian school"
+  ],
+  "Q37621": [
+   "empiricism",
+   "determinism",
+   "legal positivism"
+  ],
+  "Q41513": [
+   "Romanticism",
+   "fairy painting"
+  ],
+  "Q43936": [
+   "scholasticism",
+   "nominalism"
+  ],
+  "Q60080": [
+   "Western philosophy"
+  ],
+  "Q61078": [
+   "Marxism"
+  ],
+  "Q77045": [
+   "Neo-Kantianism"
+  ],
+  "Q77888": [
+   "German new humanism"
+  ],
+  "Q84412": [
+   "Freudo-Marxism",
+   "Orgone",
+   "vegetotherapy",
+   "Orgastic potency"
+  ],
+  "Q123608": [
+   "Modistae"
+  ],
+  "Q125249": [
+   "pragmatism",
+   "functional psychology"
+  ],
+  "Q131671": [
+   "Pre-Socratic philosophy",
+   "ancient philosophy"
+  ],
+  "Q160362": [
+   "peripatetic school"
+  ],
+  "Q192885": [
+   "literary criticism",
+   "opinion journalism"
+  ],
+  "Q214121": [
+   "Platonism"
+  ],
+  "Q280872": [
+   "skepticism"
+  ],
+  "Q311733": [
+   "Epicureanism"
+  ],
+  "Q316347": [
+   "Scottish Enlightenment",
+   "Scottish Common Sense Realism"
+  ],
+  "Q316353": [
+   "peripatetic school"
+  ],
+  "Q325955": [
+   "Platonism"
+  ],
+  "Q347893": [
+   "Western philosophy"
+  ],
+  "Q369621": [
+   "British idealism"
+  ],
+  "Q378462": [
+   "Yangmingism",
+   "Neo-Confucianism"
+  ],
+  "Q381048": [
+   "Megarian school"
+  ],
+  "Q381238": [
+   "Expressionism"
+  ],
+  "Q381765": [
+   "Cyrenaics"
+  ],
+  "Q719418": [
+   "continental philosophy"
+  ],
+  "Q731904": [
+   "Marxism"
+  ],
+  "Q5949052": [
+   "anarchism"
+  ],
+  "Q7286": [
+   "Enlightenment philosophy"
+  ],
+  "Q9397": [
+   "Cheng-Zhu school"
+  ],
+  "Q171303": [
+   "stoicism"
+  ],
+  "Q189759": [
+   "Epicureanism"
+  ],
+  "Q189767": [
+   "stoicism"
+  ],
+  "Q286107": [
+   "positivism"
+  ],
+  "Q1151004": [
+   "Yan-Li School"
+  ],
+  "Q2326613": [
+   "Cartesianism"
+  ],
+  "Q8070379": [
+   "Neo-Confucianism"
+  ]
+ }
+}
