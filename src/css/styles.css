@@ -1137,3 +1137,33 @@ section .post-figure { max-width: 100%; }
   .w4-stat .v { font-size: 1.25rem; }
   .finder-card h3 { font-size: 1.35rem; }
 }
+
+/* ---------- Week 5: the language half ---------- */
+.w5-controls { display: grid; gap: 2px; margin-bottom: 6px; }
+.w5-controls .w4-controls { margin-bottom: 6px; }
+.w5-ctl { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-faint); min-width: 7.5em; }
+.w5-select { background: var(--bg-alt); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 6px 10px; max-width: 100%; font: inherit; font-size: 0.88rem; }
+.w4-controls .btn:focus-visible, .w5-select:focus-visible, .w4-range:focus-visible, .w5-search-form input:focus-visible { outline: 2px solid var(--accent-3); outline-offset: 2px; }
+.data-table small { color: var(--text-faint); }
+.data-table tr.w5-group td { color: var(--text); font-weight: 700; font-size: 0.8rem; background: var(--panel-2); }
+.w5-notes td:last-child { min-width: 260px; color: var(--text-dim); }
+.w5-robust th, .w5-robust td { white-space: nowrap; }
+.w5-robust th.num, .w5-honesty th.num { text-align: right; }
+.data-table th.w5-sym { text-transform: none; font-size: 0.9rem; }
+.w5-honesty td { vertical-align: top; color: var(--text-dim); }
+.w5-honesty td:first-child { min-width: 170px; color: var(--text); }
+.w5-honesty td:last-child { min-width: 280px; }
+.w5-honesty td.num { font-size: 1rem; color: var(--accent-3); font-weight: 700; white-space: normal; min-width: 96px; }
+.w5-honesty code, .w4-readout code { background: rgba(255, 255, 255, 0.07); padding: 1px 5px; border-radius: 4px; color: var(--accent-3); font-size: 0.92em; }
+.w5-honesty mark { background: rgba(255, 210, 63, 0.25); color: var(--text); padding: 0 2px; border-radius: 3px; }
+.w5-toy { border-style: dashed; }
+#heaps .w4-slider-row label { font-size: 0.85rem; color: var(--text-dim); display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.w5-search-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.w5-search-form input[type="search"] { flex: 1 1 220px; min-width: 0; background: var(--bg-alt); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 9px 12px; font: inherit; }
+.w5-results { margin: 12px 0 0; padding-left: 26px; display: grid; gap: 8px; }
+.w5-results li { color: var(--text-dim); font-size: 0.92rem; }
+.w5-results small { display: block; color: var(--text-faint); overflow-wrap: anywhere; }
+.w5-score { font-variant-numeric: tabular-nums; color: var(--accent-3); margin-left: 6px; font-size: 0.85rem; }
+@media (max-width: 640px) {
+  .w5-ctl { min-width: 100%; }
+}

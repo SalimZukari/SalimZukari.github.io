@@ -5,3 +5,4 @@ Thumbs.db
 __pycache__/
 *.pyc
 data/processed/.week4_cache/
+data/processed/.week5_cache/

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Week 5: Fame Buys Length, Not New Words — Social Graphs Group Site</title>
+  <meta name="description" content="Heaps' law on the 303 Marvel Wikipedia pages: do the most-linked characters bring new words faster than a random page order, or do they only bring longer pages?" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../src/css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="site-nav" aria-label="Section navigation">
+    <div class="container">
+      <a href="#top" class="brand">MARVEL<span class="dot">•</span>WORDS</a>
+      <button class="btn btn-ghost nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links">☰ Menu</button>
+      <div class="nav-links" id="nav-links">
+        <a href="#hook">Hook</a>
+        <a href="#reframe">Reframe</a>
+        <a href="#heaps">Heaps</a>
+        <a href="#robust">Robustness</a>
+        <a href="#text-wins">The text wins</a>
+        <a href="#conclusions">Conclusions</a>
+        <a href="#toy">Toy</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div id="load-status" class="container"></div>
+
+    <div id="app" hidden>
+      <div class="container" style="padding-top:50px" id="top">
+        <span class="section-kicker">Week 5 · The language half · Does fame buy you words?</span>
+        <h1 class="section-title" style="font-size:clamp(2rem,5vw,3rem)">Fame buys length, not new words</h1>
+        <div class="post-meta">
+          <a class="badge" href="https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html#go-nuts" target="_blank" rel="noopener">Exercise 5.9 — Go nuts with your LLM ↗</a>
+          <a class="badge" href="https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html" target="_blank" rel="noopener">Course page ↗</a>
+          <a class="badge" href="week5/week5_gonuts.ipynb">Notebook ↗</a>
+          <a class="badge" href="week5/week5_gonuts.md">Write-up ↗</a>
+        </div>
+        <p class="section-lede">
+          For four weeks the Marvel characters were dots with links between them. This week each dot is also a
+          Wikipedia article. The best-linked characters have the longest articles, which is no surprise. The
+          question here is narrower: do their pages bring new words any faster than anyone else's, or are they
+          only longer?
+        </p>
+
+        <div class="story-grid" style="margin-bottom:10px">
+          <div class="story-card"><h3>What we asked</h3><p id="wk5-asked"></p></div>
+          <div class="story-card"><h3>What we did</h3><p id="wk5-did"></p></div>
+          <div class="story-card"><h3>What we found</h3><p id="wk5-found"></p></div>
+          <div class="story-card"><h3>What surprised us</h3><p id="wk5-surprised"></p></div>
+        </div>
+        <p class="w4-lede-note" id="wk5-corpusnote"></p>
+      </div>
+
+      <!-- 1. HOOK -->
+      <section id="hook">
+        <div class="container">
+          <span class="section-kicker">1 · The hook</span>
+          <h2 class="section-title">More links in, more words on the page</h2>
+          <p class="section-lede" id="hook-lede"></p>
+          <div class="chart-wrap">
+            <div class="w4-controls">
+              <label for="hook-select">Find a character</label>
+              <select id="hook-select" class="w5-select"></select>
+            </div>
+            <div id="hook-chart" class="w4-svg" role="img" aria-label="Scatter plot of page length in tokens against in-degree for all 303 Marvel character pages, both on logarithmic-style axes. Length rises with in-degree. Ten pages far from that trend are coloured and labelled; they are listed in the table below the chart."></div>
+            <p class="w4-readout" id="hook-readout" aria-live="polite">Hover or tap a dot, or pick a character above, to read its numbers.</p>
+            <div class="w4-legend" id="hook-legend"></div>
+            <p class="chart-caption" id="hook-caption"></p>
+          </div>
+          <h3 style="margin-top:28px">The pages that don't fit, and why</h3>
+          <p class="section-lede" id="hook-outlier-lede"></p>
+          <div class="w4-table-wrap" id="hook-table"></div>
+          <p class="section-lede" style="margin-top:16px" id="hook-why"></p>
+        </div>
+      </section>
+
+      <!-- 2. REFRAME -->
+      <section id="reframe">
+        <div class="container">
+          <span class="section-kicker">2 · Before answering</span>
+          <h2 class="section-title">Length is not vocabulary</h2>
+          <p class="section-lede" id="reframe-lede"></p>
+          <div class="w4-stats" id="reframe-stats"></div>
+          <p class="chart-caption" id="reframe-caption"></p>
+          <p class="section-lede" style="margin-top:20px" id="reframe-text"></p>
+        </div>
+      </section>
+
+      <!-- 3. HERO -->
+      <section id="heaps">
+        <div class="container">
+          <span class="section-kicker">3 · The figure</span>
+          <h2 class="section-title">Read the famous first, then shuffle the pile</h2>
+          <p class="section-lede" id="heaps-lede"></p>
+          <div class="chart-wrap">
+            <div class="w5-controls">
+              <div class="w4-controls" role="group" aria-label="Order the pages by" id="heaps-order"><span class="w5-ctl">Order pages by</span></div>
+              <div class="w4-controls" role="group" aria-label="Direction" id="heaps-dir"><span class="w5-ctl">Read</span></div>
+              <div class="w4-controls" role="group" aria-label="Stopwords" id="heaps-stop"><span class="w5-ctl">Stopwords</span></div>
+              <div class="w4-controls" role="group" aria-label="Axes of the upper panel" id="heaps-axes"><span class="w5-ctl">Upper axes</span></div>
+            </div>
+            <div class="w4-legend" id="heaps-legend"></div>
+            <div id="heaps-chart" class="w4-svg" role="img" aria-label="Two stacked charts sharing a horizontal axis, tokens read so far. Upper: number of distinct word types seen so far for the chosen page order, drawn over a band covering 500 random page orders, with a fitted power law. Lower: the same curve as a percentage above or below the random orders' mean, with the band's full range and its middle 95 percent. The readouts below give every number shown."></div>
+            <div class="w4-slider-row" style="margin-top:10px">
+              <label for="heaps-cursor">Move along the curve <input class="w4-range" type="range" id="heaps-cursor" min="0" max="1" step="1" value="0" aria-describedby="heaps-cursor-readout" /></label>
+            </div>
+            <p class="w4-readout" id="heaps-fit-readout" aria-live="polite"></p>
+            <p class="w4-readout" id="heaps-cursor-readout" aria-live="polite"></p>
+            <p class="chart-caption" id="heaps-caption"></p>
+          </div>
+          <h3 style="margin-top:28px">The verdict</h3>
+          <div class="post-body" id="heaps-verdict"></div>
+          <h3 style="margin-top:22px">What the pages nobody links to bring</h3>
+          <p class="section-lede" id="tail-lede"></p>
+          <div class="w4-stats" id="tail-stats"></div>
+          <p class="section-lede" style="margin-top:18px" id="tail-text"></p>
+        </div>
+      </section>
+
+      <!-- 4. ROBUSTNESS -->
+      <section id="robust">
+        <div class="container">
+          <span class="section-kicker">4 · Robustness</span>
+          <h2 class="section-title">Other kinds of fame, and no stopwords</h2>
+          <p class="section-lede" id="robust-lede"></p>
+          <div class="w4-table-wrap" id="robust-table"></div>
+          <p class="chart-caption" id="robust-caption"></p>
+          <p class="section-lede" style="margin-top:18px" id="robust-text"></p>
+        </div>
+      </section>
+
+      <!-- 5. THE TEXT WINS -->
+      <section id="text-wins">
+        <div class="container">
+          <span class="section-kicker">5 · Inspect the text underneath</span>
+          <h2 class="section-title">Where the code and the text disagreed</h2>
+          <p class="section-lede" id="honesty-lede"></p>
+          <div class="chart-wrap">
+            <div class="w4-table-wrap" id="honesty-table"></div>
+            <p class="chart-caption" id="honesty-caption"></p>
+          </div>
+          <div class="callout" id="honesty-rule"></div>
+        </div>
+      </section>
+
+      <!-- 6. CONCLUSIONS -->
+      <section id="conclusions">
+        <div class="container">
+          <span class="section-kicker">What we can and can't conclude</span>
+          <h2 class="section-title">Limits, and the bottom line</h2>
+          <div class="post-body" id="concl-body"></div>
+
+          <h3 style="margin-top:30px">Grading an LLM</h3>
+          <p class="section-lede" id="llm-intro"></p>
+          <p class="llm-paragraph" id="llm-paragraph"></p>
+          <div id="llm-claims"></div>
+
+          <div class="callout" id="next-week"></div>
+
+          <details class="chart-summary" style="margin-top:18px">
+            <summary>Sanity checks: this pipeline vs our exercise notebook</summary>
+            <div class="w4-table-wrap" id="sanity-table" style="margin-top:10px"></div>
+          </details>
+          <details class="chart-summary">
+            <summary>Validation of our own code</summary>
+            <div class="post-body" id="validation-text" style="margin-top:10px"></div>
+          </details>
+          <p class="section-lede" style="margin-top:18px">
+            Full exercise: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html#go-nuts" target="_blank" rel="noopener">exercise 5.9 on the course page</a>
+            (openers 5 and 6, combined). We built on the course's explorables for
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html#tokens" target="_blank" rel="noopener">tokenization and preprocessing</a>,
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html#counting" target="_blank" rel="noopener">Zipf and the rank-frequency plot</a>,
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html#documents" target="_blank" rel="noopener">the Bag-of-Words matrix</a> and
+            <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html#counting-stops" target="_blank" rel="noopener">the Marvel lookalikes (cosine similarity)</a>.
+          </p>
+          <p class="chart-caption" id="wk5-meta"></p>
+        </div>
+      </section>
+
+      <!-- 7. TOY -->
+      <section id="toy">
+        <div class="container">
+          <span class="section-kicker">A toy, not a finding</span>
+          <h2 class="section-title">A Marvel search engine in a few lines</h2>
+          <p class="section-lede" id="toy-lede"></p>
+          <div class="chart-wrap w5-toy">
+            <form id="toy-form" class="w5-search-form">
+              <label for="toy-input" class="visually-hidden">Search the 303 pages</label>
+              <input type="search" id="toy-input" placeholder="Norse god of thunder" autocomplete="off" />
+              <button class="btn" type="submit">Search</button>
+              <label class="sixdeg-toggle"><input type="checkbox" id="toy-stop" /> Drop stopwords</label>
+            </form>
+            <div class="w4-controls" id="toy-examples" role="group" aria-label="Example queries" style="margin-top:10px"></div>
+            <p class="w4-readout" id="toy-status" aria-live="polite">The index loads the first time you search.</p>
+            <ol class="w5-results" id="toy-results"></ol>
+            <p class="chart-caption" id="toy-caption"></p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Built for the <strong>Social Graphs / Network Science</strong> course — Week 5 group exercise.</p>
+      <p>
+        Course exercise: <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html" target="_blank" rel="noopener">Week 5 page</a> ·
+        Notebook: <a href="week5/week5_gonuts.ipynb">week5_gonuts.ipynb</a> ·
+        Data: <a href="https://sunelehmann.com/socialgraphs2026-web/data/" target="_blank" rel="noopener">course data page</a>
+      </p>
+      <p>Page text comes from Wikipedia via the course dataset. No official Marvel artwork, logos, or trademarks are used. All visual design is original.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script type="module" src="../src/js/week5.js"></script>
+  <script type="module">
+    import { initWeekNav } from "../src/js/weeknav.js";
+
+    const toggle = document.getElementById("nav-toggle");
+    const links = document.getElementById("nav-links");
+    toggle.addEventListener("click", () => {
+      const open = links.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+    links.querySelectorAll("a").forEach((a) =>
+      a.addEventListener("click", () => {
+        links.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      })
+    );
+
+    initWeekNav(5);
+  </script>
+</body>
+</html>

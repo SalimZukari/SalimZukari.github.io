@@ -47,7 +47,11 @@ export const WEEKS = [
   {
     n: 5,
     courseTitle: "The language half · NLP I",
-    status: "coming",
+    title: "Fame Buys Length, Not New Words",
+    teaser: "Does fame buy you words? The most-linked Marvel characters get longer Wikipedia pages, but read them first and Heaps' curve looks like any random order. The new words come from the pages nobody links to.",
+    status: "live",
+    href: "weeks/week5.html",
+    course: "https://sunelehmann.com/socialgraphs2026-web/weeks/week5.html",
   },
   {
     n: 6,

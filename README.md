@@ -17,7 +17,8 @@ Course home: https://sunelehmann.com/socialgraphs2026-web/index.html
 | 2 | Models & null models | [The Friendship Paradox](weeks/week2.html) — degree-preserving null model on Marvel | Live |
 | 3 | Who matters, and why | [Who Holds the Marvel Universe Together?](weeks/week3.html) — brokers, robustness, six degrees of Spider-Man | Live |
 | 4 | Communities & backbones | [Solid Cores, Moving Borders](weeks/week4.html) — where are the borders of philosophy? Louvain stability, Infomap, overlap, disparity backbone on the philosophers network | Live |
-| 5–8 | NLP I–III, Networks × language | — | Coming |
+| 5 | The language half · NLP I | [Fame Buys Length, Not New Words](weeks/week5.html) — does fame buy you words? Heaps' curves with the most-linked Marvel characters read first, against 500 random page orders | Live |
+| 6–8 | NLP II–III, Networks × language | — | Coming |
 
 The Week 1 page includes a dedicated **🧠 Course Exercise** section mapping the Week 1
 questions (degree, degree sums, average degree, density, degree distribution, in/out-degree,
@@ -48,6 +49,12 @@ Week 4 switches to the course's **philosophers network** (the course dataset's o
   (2026-09-23) and cached so the pipeline runs offline
 
 All three TSVs were downloaded from the course data page on 2026-09-23 and are byte-identical to the class hand-outs.
+
+Week 5 adds the text of the same 303 Marvel pages:
+
+- `data/raw/marvel_pages.zip`: 303 plain-text Wikipedia articles, one per Week 1 node (the course's week 5 release, frozen
+  snapshot 2026-08-26; 1.8 MB, 4.4 million characters). File names are URL-encoded node ids. Committed as downloaded, so the
+  pipeline runs offline; it joins onto `week1_nodes.tsv` / `week1_edges.tsv` by node id.
 
 ## Analysis pipelines
 
@@ -85,10 +92,24 @@ recomputes everything (about 2–3 minutes) and prints a runtime summary and a s
 `scripts/week4_validate_browser.mjs` (`npm run validate:week4`) checks the page's in-browser computations
 (`src/js/week4_core.js`) against the JSON. `weeks/week4/week4_gonuts.ipynb` holds the exploration and validation cells.
 
+**Week 5 — `scripts/week5_analyze.py` → `data/processed/week5.json`, `data/processed/week5_search.json` + `weeks/week5/figures/`.**
+Page length against in-/out-/total degree (Spearman, outliers by rank gap), type counts at equal token budgets (exact rarefaction and
+contiguous windows), and Heaps curves V(n) with the pages concatenated in eight orders (in-degree, out-degree, total degree, page
+length; most or least first), with stopwords kept and removed, each against a band of 500 uniformly random page orders (seed 42) with
+K and β fitted and empirical p-values for both. A second, length-matched shuffle tests what the zero-in-degree pages add at the end.
+Every count states its tokenizer (spaCy's, or a `CountVectorizer` pattern), token counts are checked against raw-text regexes, and the
+numbers worked out in the exercise notebook are recomputed and compared on every run. `week5_search.json` is the Bag-of-Words inverted
+index behind the page's toy search box, loaded on first use. The loader, tokenization and raw-text checks are lifted from our exercise
+notebook; degrees reuse `scripts/analyze.py`'s parsing. Tokenizing and the shuffles are cached in `data/processed/.week5_cache/`
+(git-ignored); `python scripts/week5_analyze.py --no-cache` recomputes everything (about 2 minutes) and prints a runtime summary.
+`scripts/week5_validate_browser.mjs` (`npm run validate:week5`) checks the page's in-browser fit and search ranking
+(`src/js/week5_core.js`) against the JSON. `weeks/week5/week5_gonuts.ipynb` holds the exploration and validation cells.
+
 ## Running locally
 
 Requirements: Python 3 with `pandas`, `networkx` (≥ 3.4, for `forceatlas2_layout`), `numpy`, `scipy`,
-`matplotlib`, `scikit-learn` and `infomap` (Week 4), Node (for `validate:week4`), and any static file server.
+`matplotlib`, `scikit-learn` and `infomap` (Week 4), `spacy` with its `en_core_web_sm` model (Week 5:
+`python -m spacy download en_core_web_sm`), Node (for `validate:week4` / `validate:week5`), and any static file server.
 
 ```bash
 # 1. Regenerate the analyses from the raw dataset
@@ -96,6 +117,8 @@ npm run analyze          # Week 1 -> data/processed/analysis.json
 npm run analyze:week3    # Week 3 -> data/processed/week3.json + weeks/week3/figures/
 npm run analyze:week4    # Week 4 -> data/processed/week4.json + weeks/week4/figures/
 npm run validate:week4   # Week 4 in-browser computations vs the Python output
+npm run analyze:week5    # Week 5 -> data/processed/week5.json, week5_search.json + weeks/week5/figures/
+npm run validate:week5   # Week 5 in-browser fit and search ranking vs the Python output
 
 # 2. Serve the site locally (any static server works)
 npm start
@@ -116,9 +139,11 @@ weeks/
   week2.html                  # Week 2 — The Friendship Paradox
   week3.html                  # Week 3 — Who Holds the Marvel Universe Together?
   week4.html                  # Week 4 — Solid Cores, Moving Borders (philosophers)
+  week5.html                  # Week 5 — Fame Buys Length, Not New Words (Marvel pages as text)
   week2/                      # week2_gonuts.ipynb, week2_gonuts.md, figures/*.png
   week3/                      # week3_gonuts.ipynb, week3_gonuts.md, figures/*.png
   week4/                      # week4_gonuts.ipynb, week4_gonuts.md, figures/*.png
+  week5/                      # week5_gonuts.ipynb, week5_gonuts.md, figures/*.png
 week2.html                    # redirect stub -> weeks/week2.html (old links)
 src/css/styles.css            # shared dark/comic visual design system
 src/js/
@@ -128,13 +153,16 @@ src/js/
   data.js, main.js, charts.js, network.js, hero.js, experiments.js   # Week 1 dashboard
   week3.js                    # Week 3 page
   week4.js, week4_core.js     # Week 4 page; week4_core.js = pure computations shared with the Node validator
-data/raw/                     # frozen course snapshots (Marvel weeks 1 + 4, philosophers week 4) + Wikidata caches
-data/processed/               # analysis.json (Week 1), week3.json (Week 3), week4.json (Week 4)
+  week5.js, week5_core.js     # Week 5 page; week5_core.js = power-law fit + Bag-of-Words ranking, shared with the Node validator
+data/raw/                     # frozen course snapshots (Marvel weeks 1 + 4 + 5, philosophers week 4) + Wikidata caches
+data/processed/               # analysis.json (Week 1), week3.json (Week 3), week4.json (Week 4), week5.json + week5_search.json (Week 5)
 scripts/analyze.py            # Week 1 pipeline ("npm run analyze")
 scripts/week3_analyze.py      # Week 3 pipeline ("npm run analyze:week3")
 scripts/week4_analyze.py      # Week 4 pipeline ("npm run analyze:week4")
 scripts/netlib.py             # shared loaders, nulls, NMI, modularity, partition helpers
+scripts/week5_analyze.py      # Week 5 pipeline ("npm run analyze:week5")
 scripts/week4_validate_browser.mjs   # "npm run validate:week4"
+scripts/week5_validate_browser.mjs   # "npm run validate:week5"
 ```
 
 ### Adding a new week

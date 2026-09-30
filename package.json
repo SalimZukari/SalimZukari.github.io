@@ -8,6 +8,8 @@
     "analyze:week3": "python scripts/week3_analyze.py",
     "analyze:week4": "python scripts/week4_analyze.py",
     "validate:week4": "node scripts/week4_validate_browser.mjs",
+    "analyze:week5": "python scripts/week5_analyze.py",
+    "validate:week5": "node scripts/week5_validate_browser.mjs",
     "start": "npx --yes http-server . -p 8080 -c-1",
     "serve": "npm run start"
   },
