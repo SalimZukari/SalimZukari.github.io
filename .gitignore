@@ -6,3 +6,13 @@ __pycache__/
 *.pyc
 data/processed/.week4_cache/
 data/processed/.week5_cache/
+
+# Figures the pipelines and notebooks still write but no page or write-up shows
+# (the notebooks keep their own embedded copies). Regenerate freely; don't commit.
+weeks/week3/figures/
+weeks/week3/*.png
+weeks/week4/figures/fig1_nmi_matrix.png
+weeks/week4/figures/fig2_modularity_vs_nulls.png
+weeks/week4/figures/fig3_louvain_vs_infomap.png
+weeks/week4/figures/fig4_aristotle_link_communities.png
+weeks/week4/figures/fig5_alpha_sweep.png

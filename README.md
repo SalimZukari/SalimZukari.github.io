@@ -118,7 +118,7 @@ Requirements: Python 3 with `pandas`, `networkx` (≥ 3.4, for `forceatlas2_layo
 # 1. Regenerate the analyses from the raw dataset
 npm run analyze          # Week 1 -> data/processed/analysis.json
 npm run analyze:week2    # Week 2 -> data/processed/week2.json
-npm run analyze:week3    # Week 3 -> data/processed/week3.json + weeks/week3/figures/
+npm run analyze:week3    # Week 3 -> data/processed/week3.json (+ weeks/week3/figures/, git-ignored)
 npm run analyze:week4    # Week 4 -> data/processed/week4.json + weeks/week4/figures/
 npm run validate:week4   # Week 4 in-browser computations vs the Python output
 npm run analyze:week5    # Week 5 -> data/processed/week5.json, week5_search.json + weeks/week5/figures/
@@ -144,8 +144,8 @@ weeks/
   week3.html                  # Week 3 — Who Holds the Marvel Universe Together?
   week4.html                  # Week 4 — Solid Cores, Moving Borders (philosophers)
   week5.html                  # Week 5 — Fame Buys Length, Not New Words (Marvel pages as text)
-  week2/                      # week2_gonuts.ipynb, week2_gonuts.md, figures/*.png (original static figures)
-  week3/                      # week3_gonuts.ipynb, week3_gonuts.md, figures/*.png
+  week2/                      # week2_gonuts.ipynb, week2_gonuts.md, figures/*.png (embedded in the .md)
+  week3/                      # week3_gonuts.ipynb, week3_gonuts.md (figures/ is regenerated and git-ignored)
   week4/                      # week4_gonuts.ipynb, week4_gonuts.md, figures/*.png
   week5/                      # week5_gonuts.ipynb, week5_gonuts.md, figures/*.png
 week2.html                    # redirect stub -> weeks/week2.html (old links)

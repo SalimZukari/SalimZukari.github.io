@@ -12,7 +12,6 @@
   <style>
     /* Small additions specific to this static write-up page — everything else reuses styles.css */
     .figure-panel { padding: 18px; margin: 0 0 32px; }
-    .figure-panel img { display: block; width: 100%; margin-top: 10px; border-radius: var(--radius-sm); background: #05070c; }
     .prose { color: var(--text-dim); font-size: 1.02rem; max-width: 74ch; }
     .prose p { margin: 0 0 16px; }
     .prose strong { color: var(--text); }
@@ -156,10 +155,6 @@
         <figure class="panel figure-panel">
           <div><div id="w2-ccdf" data-w2-chart style="min-height:380px" role="img" aria-label="Degree CCDF on log-log axes for BA(5000), its random control, Marvel, and Marvel's random control. Hover, focus or tap a point for its value; use the buttons to show or hide a network."></div></div>
           <p class="w4-readout" id="w2-ccdf-readout" aria-live="polite">Hover, tap or Tab to a point to read P(K ≥ k). Click a network below to hide or show it.</p>
-          <details class="chart-summary">
-            <summary>Original matplotlib figure (for comparison)</summary>
-            <img src="week2/figures/fig1_degree_ccdf.png" alt="Degree CCDF on log-log axes for BA(5000), its random control, Marvel, and Marvel's random control" loading="lazy" />
-          </details>
           <figcaption class="chart-caption">
             <strong>Figure 1 — Degree CCDF, log-log.</strong> Marvel and BA(5000) both show visibly
             heavier tails than their size-matched random controls; the steeper and straighter the
@@ -170,10 +165,6 @@
         <figure class="panel figure-panel">
           <div id="w2-paradox" data-w2-chart style="min-height:360px" role="img" aria-label="Bar chart comparing mean person degree vs mean friend degree across the four networks. Hover, focus or tap a bar for its values."></div>
           <p class="w4-readout" id="w2-paradox-readout" aria-live="polite">Hover, tap or Tab to a bar to read the sampled means for that network.</p>
-          <details class="chart-summary">
-            <summary>Original matplotlib figure (for comparison)</summary>
-            <img src="week2/figures/fig2_paradox_by_network.png" alt="Bar chart comparing mean person degree vs mean friend degree across the four networks" loading="lazy" />
-          </details>
           <figcaption class="chart-caption">
             <strong>Figure 2 — Mean person vs. mean friend degree</strong>, 1,000 samples per network
             (bar labels: fraction of pairs where the friend is at least as connected). The random
@@ -208,10 +199,6 @@
         <figure class="panel figure-panel">
           <div id="w2-outpop" data-w2-chart style="min-height:320px" role="img" aria-label="Histogram of out-popularity'd rate across the Marvel characters, with Spider-Man marked at rate zero. Hover, focus or tap a bar to list the characters in it."></div>
           <p class="w4-readout" id="w2-outpop-readout" aria-live="polite">Hover, tap or Tab to a bar to see which characters are in it.</p>
-          <details class="chart-summary">
-            <summary>Original matplotlib figure (for comparison)</summary>
-            <img src="week2/figures/fig3_out_popularity_rate.png" alt="Histogram of out-popularity'd rate across 277 Marvel characters, with Spider-Man marked at rate zero" loading="lazy" />
-          </details>
           <figcaption class="chart-caption">
             <strong>Figure 3 — Distribution of the out-popularity'd rate</strong> across all 277
             characters. Median character: about 5 out of 6 friends are at least as popular as they
@@ -257,10 +244,6 @@
             <div id="w2-null-friend" data-w2-chart style="min-height:320px" role="img" aria-label="Null distribution of the mean friend degree, from 500 degree-preserving shuffles, real Marvel marked in red."></div>
           </div>
           <p class="w4-readout" id="w2-null-readout" aria-live="polite">Hover, tap or Tab to a bar to see how many shuffles landed there.</p>
-          <details class="chart-summary">
-            <summary>Original matplotlib figure (for comparison)</summary>
-            <img src="week2/figures/fig4_null_model.png" alt="Histograms of the null distribution from 500 degree-preserving shuffles, with real Marvel marked in red on both panels" loading="lazy" />
-          </details>
           <figcaption class="chart-caption">
             <strong>Figure 4 — Null distributions from 500 degree-preserving shuffles</strong>, real
             Marvel marked in red. Left: fraction of pairs where friend ≥ person (real = <span data-w2="nullModel.fracFriendGE.real" data-fmt="f2">0.75</span>, null
