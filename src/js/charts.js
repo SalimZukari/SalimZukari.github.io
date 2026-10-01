@@ -1,36 +1,28 @@
 // D3-based charts: degree distribution (linear + log-log), in/out-degree
 // scatter, component-size bars, and the density grid metaphor.
 /* global d3 */
+import { bindTip } from "./tooltip.js";
 
-function tooltip() {
-  let el = document.querySelector(".bar-hover-tip");
-  if (!el) {
-    el = document.createElement("div");
-    el.className = "bar-hover-tip";
-    el.style.display = "none";
-    document.body.appendChild(el);
-  }
-  return el;
+// Visible dots are r=4-4.5, too small to hit reliably with a finger or a
+// trackpad, so each one gets a transparent r=11 hit circle in a layer *under*
+// the visible dots: pointing straight at a dot still picks that dot, pointing
+// near it picks it too.
+const HIT_R = 11;
+function addHitDots(parent, data, cx, cy) {
+  return parent
+    .append("g")
+    .attr("class", "hit-layer")
+    .selectAll("circle")
+    .data(data)
+    .join("circle")
+    .attr("class", "hit-dot")
+    .attr("r", HIT_R)
+    .attr("cx", cx)
+    .attr("cy", cy)
+    .attr("aria-hidden", "true");
 }
 
-function showTip(html, event) {
-  const tip = tooltip();
-  tip.innerHTML = html;
-  tip.style.display = "block";
-  tip.style.left = `${event.clientX + 14}px`;
-  tip.style.top = `${event.clientY + 14}px`;
-}
-function hideTip() {
-  const tip = document.querySelector(".bar-hover-tip");
-  if (tip) tip.style.display = "none";
-}
-document.addEventListener("mousemove", (e) => {
-  const tip = document.querySelector(".bar-hover-tip");
-  if (tip && tip.style.display === "block") {
-    tip.style.left = `${e.clientX + 14}px`;
-    tip.style.top = `${e.clientY + 14}px`;
-  }
-});
+let clipSeq = 0;
 
 function clear(container) {
   d3.select(container).selectAll("*").remove();
@@ -109,12 +101,9 @@ export function renderDegreeDistribution(container, dist, opts = {}) {
     .attr("tabindex", "0")
     .attr("role", "img")
     .attr("aria-label", (d) => `Degree ${d.k}: ${d.count} characters`)
-    .on("mouseenter focus", function (event, d) {
-      showTip(`<strong>Degree ${d.k}</strong><br>${d.count} character${d.count === 1 ? "" : "s"}`, event);
-      if (opts.onHover) opts.onHover(d);
-    })
-    .on("mousemove", (event) => showTip(tooltip().innerHTML, event))
-    .on("mouseleave blur", () => hideTip());
+    .call(bindTip, (d) => `<strong>Degree ${d.k}</strong><br>${d.count} character${d.count === 1 ? "" : "s"}`, {
+      onShow: (event, d) => opts.onHover && opts.onHover(d),
+    });
 }
 
 export function renderScatter(container, nodes, opts = {}) {
@@ -124,9 +113,14 @@ export function renderScatter(container, nodes, opts = {}) {
   const innerW = width - margin.left - margin.right;
   const innerH = height - margin.top - margin.bottom;
 
-  const clip = svg.append("defs").append("clipPath").attr("id", "scatter-clip").append("rect").attr("width", innerW).attr("height", innerH);
+  // unique per call: two scatters on one page must not share a clipPath id
+  const clipId = `scatter-clip-${++clipSeq}`;
+  svg.append("defs").append("clipPath").attr("id", clipId).append("rect").attr("width", innerW).attr("height", innerH);
 
   const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+  // transparent surface so wheel/drag on empty plot area reaches the zoom
+  // behaviour, which is bound to g so its pointer coordinates match the scales
+  g.append("rect").attr("class", "zoom-surface").attr("width", innerW).attr("height", innerH).attr("fill", "transparent");
 
   const maxVal = Math.max(d3.max(nodes, (d) => d.inDegree), d3.max(nodes, (d) => d.outDegree)) || 1;
 
@@ -152,7 +146,7 @@ export function renderScatter(container, nodes, opts = {}) {
     .style("font-size", "0.8rem")
     .text("In-degree (links pointing here)");
 
-  const plotArea = g.append("g").attr("clip-path", "url(#scatter-clip)");
+  const plotArea = g.append("g").attr("clip-path", `url(#${clipId})`);
 
   plotArea
     .append("line")
@@ -162,6 +156,7 @@ export function renderScatter(container, nodes, opts = {}) {
     .attr("x2", x(maxVal * 1.05))
     .attr("y2", y(maxVal * 1.05));
 
+  const hits = addHitDots(plotArea, nodes, (d) => x(d.outDegree), (d) => y(d.inDegree));
   const dots = plotArea
     .append("g")
     .selectAll("circle")
@@ -172,19 +167,16 @@ export function renderScatter(container, nodes, opts = {}) {
     .attr("cy", (d) => y(d.inDegree))
     .attr("r", 4.5)
     .attr("tabindex", "0")
-    .attr("aria-label", (d) => `${d.name}: in-degree ${d.inDegree}, out-degree ${d.outDegree}`)
-    .on("mouseenter focus", function (event, d) {
-      d3.select(this).attr("r", 7);
-      showTip(
-        `<strong>${d.name}</strong><br>In-degree: ${d.inDegree}<br>Out-degree: ${d.outDegree}`,
-        event
-      );
-      if (opts.onHover) opts.onHover(d);
-    })
-    .on("mousemove", (event) => showTip(tooltip().innerHTML, event))
-    .on("mouseleave blur", function () {
-      d3.select(this).attr("r", 4.5);
-      hideTip();
+    .attr("aria-label", (d) => `${d.name}: in-degree ${d.inDegree}, out-degree ${d.outDegree}`);
+
+  const dotOf = (d) => dots.filter((n) => n === d);
+  d3.selectAll([...hits.nodes(), ...dots.nodes()])
+    .call(bindTip, (d) => `<strong>${d.name}</strong><br>In-degree: ${d.inDegree}<br>Out-degree: ${d.outDegree}`, {
+      onShow: (event, d) => {
+        dotOf(d).attr("r", 7);
+        if (opts.onHover) opts.onHover(d);
+      },
+      onHide: (event, d) => dotOf(d).attr("r", 4.5),
     })
     .on("click", (event, d) => {
       if (opts.onClick) opts.onClick(d);
@@ -196,6 +188,7 @@ export function renderScatter(container, nodes, opts = {}) {
     xAxisG.call(d3.axisBottom(zx));
     yAxisG.call(d3.axisLeft(zy));
     dots.attr("cx", (d) => zx(d.outDegree)).attr("cy", (d) => zy(d.inDegree));
+    hits.attr("cx", (d) => zx(d.outDegree)).attr("cy", (d) => zy(d.inDegree));
     plotArea
       .select(".ref-line")
       .attr("x1", zx(0))
@@ -204,15 +197,12 @@ export function renderScatter(container, nodes, opts = {}) {
       .attr("y2", zy(maxVal * 1.05));
   };
 
-  svg.call(
+  g.call(
     d3.zoom()
       .scaleExtent([1, 12])
       .translateExtent([[0, 0], [innerW, innerH]])
       .extent([[0, 0], [innerW, innerH]])
-      .on("zoom", (event) => {
-        g.attr("transform", null);
-        zoomed(event);
-      })
+      .on("zoom", zoomed)
   );
 }
 
@@ -244,7 +234,7 @@ export function renderComponentBars(container, components) {
  * visible after the pointer moves away (and works on touch/keyboard).
  * @param {HTMLElement} container
  * @param {Array<{id:string,name:string,degree:number,z:number}>} points
- * @param {{ label: string, labelIds?: string[], onSelect?: Function }} opts
+ * @param {{ label: string, labelIds?: string[], onHover?: Function, onSelect?: Function }} opts
  */
 export function renderZScoreScatter(container, points, opts = {}) {
   clear(container);
@@ -280,13 +270,9 @@ export function renderZScoreScatter(container, points, opts = {}) {
 
   const labelSet = new Set(opts.labelIds || []);
 
-  function selectPoint(event, d, dotSelection) {
-    dotSelection.attr("stroke", null).attr("stroke-width", null);
-    d3.select(event.currentTarget).attr("stroke", "var(--accent-3)").attr("stroke-width", 2.5);
-    if (opts.onSelect) opts.onSelect(d);
-  }
-
+  const hits = addHitDots(g, points, (d) => x(Math.max(d.degree, 1)), (d) => y(d.z));
   const dots = g
+    .append("g")
     .selectAll("circle.zdot")
     .data(points)
     .join("circle")
@@ -300,22 +286,27 @@ export function renderZScoreScatter(container, points, opts = {}) {
     .attr("role", "button")
     .attr("aria-label", (d) => `${d.name}: degree ${d.degree}, z-score ${d.z.toFixed(2)}`);
 
-  dots
-    .on("mouseenter focus", function (event, d) {
-      d3.select(this).raise();
-      showTip(`<strong>${d.name}</strong><br>degree ${d.degree}<br>z = ${d.z.toFixed(2)}`, event);
+  const dotOf = (d) => dots.filter((p) => p === d);
+  function selectPoint(d) {
+    dots.attr("stroke", null).attr("stroke-width", null);
+    dotOf(d).attr("stroke", "var(--accent-3)").attr("stroke-width", 2.5);
+    if (opts.onSelect) opts.onSelect(d);
+  }
+
+  d3.selectAll([...hits.nodes(), ...dots.nodes()])
+    .call(bindTip, (d) => `<strong>${d.name}</strong><br>degree ${d.degree}<br>z = ${d.z.toFixed(2)}`, {
+      onShow: (event, d) => {
+        dotOf(d).raise();
+        if (opts.onHover) opts.onHover(d);
+      },
     })
-    .on("mousemove", (event) => showTip(tooltip().innerHTML, event))
-    .on("mouseleave blur", () => hideTip())
-    .on("click", function (event, d) {
-      selectPoint(event, d, dots);
-    })
-    .on("keydown", function (event, d) {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        selectPoint(event, d, dots);
-      }
-    });
+    .on("click", (event, d) => selectPoint(d));
+  dots.on("keydown", (event, d) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectPoint(d);
+    }
+  });
 }
 
 /**
@@ -359,11 +350,7 @@ export function renderRemovalChart(container, series) {
     .attr("stroke", (s) => s.color)
     .attr("stroke-width", 2.2)
     .attr("d", (s) => line(s.points))
-    .on("mouseenter focus", function (event, s) {
-      showTip(`<strong>${s.label}</strong>`, event);
-    })
-    .on("mousemove", (event) => showTip(tooltip().innerHTML, event))
-    .on("mouseleave blur", () => hideTip());
+    .call(bindTip, (s) => `<strong>${s.label}</strong>`);
 
   const legend = d3.select(container.parentElement).select(".removal-legend").empty()
     ? d3.select(container.parentElement).append("div").attr("class", "removal-legend")
@@ -382,6 +369,209 @@ export function renderRemovalChart(container, series) {
       d3.select(this).classed("is-hidden", s.hidden);
       paths.filter((d) => d.key === s.key).attr("display", s.hidden ? "none" : null);
     });
+}
+
+// A row of toggle buttons under a chart (same markup as the removal chart's
+// legend); clicking one shows/hides that series.
+function toggleLegend(container, series, onToggle) {
+  const parent = d3.select(container.parentElement);
+  const legend = parent.select(".removal-legend").empty() ? parent.append("div").attr("class", "removal-legend") : parent.select(".removal-legend");
+  legend.selectAll("*").remove();
+  legend
+    .selectAll("button.removal-legend-item")
+    .data(series, (s) => s.key)
+    .join("button")
+    .attr("class", "removal-legend-item")
+    .attr("type", "button")
+    .classed("is-hidden", (s) => !!s.hidden)
+    .attr("aria-pressed", (s) => String(!s.hidden))
+    .style("--legend-color", (s) => s.color)
+    .html((s) => `<span class="removal-legend-swatch"></span>${s.label}`)
+    .on("click", function (event, s) {
+      s.hidden = !s.hidden;
+      d3.select(this).classed("is-hidden", s.hidden).attr("aria-pressed", String(!s.hidden));
+      onToggle(s);
+    });
+}
+
+/**
+ * Week 2: degree CCDF on log-log axes, one line per network. Drawn exactly
+ * like matplotlib's loglog of the sorted degree sequence: a vertical run at
+ * each degree k from P(K > k) + 1/n up to P(K >= k), then on to the next k.
+ * Every distinct degree is a hoverable / focusable / tappable point.
+ * @param {HTMLElement} container
+ * @param {Array<{key:string,label:string,color:string,n:number,points:Array<{k:number,p:number}>}>} series
+ * @param {{ onHover?: Function }} opts  onHover(series, point)
+ */
+export function renderCcdf(container, series, opts = {}) {
+  clear(container);
+  const margin = { top: 16, right: 20, bottom: 46, left: 62 };
+  const { svg, width, height } = responsiveSvg(container, 380);
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const all = series.flatMap((s) => s.points);
+  const x = d3.scaleLog().domain([0.8, d3.max(all, (p) => p.k) * 1.3]).range([0, innerW]);
+  const y = d3.scaleLog().domain([d3.min(all, (p) => p.p) * 0.6, 1.4]).range([innerH, 0]);
+
+  g.append("g").attr("class", "axis").attr("transform", `translate(0,${innerH})`).call(d3.axisBottom(x).ticks(6, "~s"));
+  g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(5, "~g"));
+  g.append("text")
+    .attr("x", innerW / 2).attr("y", innerH + 38).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text("degree k (log scale)");
+  g.append("text")
+    .attr("transform", "rotate(-90)").attr("x", -innerH / 2).attr("y", -48).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text("P(K ≥ k) (log scale)");
+
+  const stairs = (s) => {
+    const desc = [...s.points].sort((a, b) => b.k - a.k);
+    const out = [];
+    desc.forEach((pt, i) => {
+      const above = i === 0 ? 0 : desc[i - 1].p; // P(K > k)
+      out.push([pt.k, above + 1 / s.n], [pt.k, pt.p]);
+    });
+    return out;
+  };
+  const line = d3.line().x((d) => x(d[0])).y((d) => y(d[1]));
+
+  const groups = g.selectAll("g.ccdf-series").data(series, (s) => s.key).join("g").attr("class", "ccdf-series");
+  groups.append("path").attr("fill", "none").attr("stroke", (s) => s.color).attr("stroke-width", 1.6).attr("d", (s) => line(stairs(s)));
+
+  const pts = series.flatMap((s) => s.points.map((p) => ({ s, ...p })));
+  const tip = (d) => `<strong>${d.s.label}</strong><br>P(K ≥ ${d.k}) = ${d3.format(".3~g")(d.p)}`;
+  const hits = addHitDots(groups, (s) => pts.filter((d) => d.s === s), (d) => x(d.k), (d) => y(d.p)).attr("r", 7);
+  const dots = groups
+    .append("g")
+    .selectAll("circle")
+    .data((s) => pts.filter((d) => d.s === s))
+    .join("circle")
+    .attr("class", "ccdf-dot")
+    .attr("cx", (d) => x(d.k))
+    .attr("cy", (d) => y(d.p))
+    .attr("r", 2.5)
+    .attr("fill", (d) => d.s.color)
+    .attr("tabindex", "0")
+    .attr("aria-label", (d) => `${d.s.label}: P(K ≥ ${d.k}) = ${d.p.toFixed(4)}`);
+  d3.selectAll([...hits.nodes(), ...dots.nodes()]).call(bindTip, tip, {
+    onShow: (event, d) => opts.onHover && opts.onHover(d.s, d),
+  });
+
+  toggleLegend(container, series, (s) => groups.filter((d) => d.key === s.key).attr("display", s.hidden ? "none" : null));
+}
+
+/**
+ * Week 2: grouped bars, one group per network, one bar per measure, with an
+ * optional note printed above each group.
+ * @param {HTMLElement} container
+ * @param {Array<{label:string, note?:string, values:Array<{key:string,label:string,value:number,color:string}>}>} groups
+ * @param {{ yLabel?: string, noteLabel?: string, onHover?: Function }} opts  onHover(group, bar)
+ */
+export function renderGroupedBars(container, groups, opts = {}) {
+  clear(container);
+  const narrow = (container.clientWidth || 600) < 560;
+  const margin = { top: 26, right: 16, bottom: narrow ? 70 : 46, left: 54 };
+  const { svg, width, height } = responsiveSvg(container, 360);
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const keys = groups[0].values.map((v) => v.key);
+  const x0 = d3.scaleBand().domain(groups.map((d) => d.label)).range([0, innerW]).paddingInner(0.22).paddingOuter(0.08);
+  const x1 = d3.scaleBand().domain(keys).range([0, x0.bandwidth()]).padding(0.04);
+  const y = d3.scaleLinear().domain([0, d3.max(groups, (d) => d3.max(d.values, (v) => v.value))]).nice().range([innerH, 0]);
+
+  const xAxis = g.append("g").attr("class", "axis").attr("transform", `translate(0,${innerH})`).call(d3.axisBottom(x0));
+  if (narrow) xAxis.selectAll("text").attr("transform", "rotate(-24)").attr("text-anchor", "end").attr("dx", "-0.4em").attr("dy", "0.6em");
+  g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(6));
+  g.append("text")
+    .attr("transform", "rotate(-90)").attr("x", -innerH / 2).attr("y", -40).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text(opts.yLabel || "");
+
+  const gg = g.selectAll("g.bar-group").data(groups).join("g").attr("class", "bar-group").attr("transform", (d) => `translate(${x0(d.label)},0)`);
+  gg.filter((d) => d.note)
+    .append("text")
+    .attr("x", x0.bandwidth() / 2).attr("y", -8).attr("text-anchor", "middle")
+    .attr("fill", "var(--text)").style("font-size", "0.78rem")
+    .text((d) => d.note);
+  gg.selectAll("rect")
+    .data((d) => d.values.map((v) => ({ group: d, ...v })))
+    .join("rect")
+    .attr("class", "grouped-bar")
+    .attr("x", (d) => x1(d.key))
+    .attr("width", x1.bandwidth())
+    .attr("y", (d) => y(d.value))
+    .attr("height", (d) => innerH - y(d.value))
+    .attr("fill", (d) => d.color)
+    .attr("tabindex", "0")
+    .attr("aria-label", (d) => `${d.group.label}, ${d.label}: ${d.value.toFixed(2)}`)
+    .call(bindTip, (d) => `<strong>${d.group.label}</strong><br>${d.label}: ${d.value.toFixed(2)}${d.group.note ? `<br>${opts.noteLabel ? `${opts.noteLabel} ` : ""}${d.group.note}` : ""}`, {
+      onShow: (event, d) => opts.onHover && opts.onHover(d.group, d),
+    });
+}
+
+/**
+ * Week 2: histogram of precomputed bins (the pipeline bins with np.histogram,
+ * so these are exactly the bars matplotlib drew), with an optional marker
+ * line, e.g. the real network's value against a null distribution.
+ * @param {HTMLElement} container
+ * @param {Array<{x0:number,x1:number,count:number}>} bins
+ * @param {{ xLabel?: string, yLabel?: string, marker?: {value:number,label:string}, binLabel?: Function, onHover?: Function }} opts
+ */
+export function renderHistogram(container, bins, opts = {}) {
+  clear(container);
+  const margin = { top: 16, right: 18, bottom: 46, left: 54 };
+  const { svg, width, height } = responsiveSvg(container, 320);
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const lo = Math.min(bins[0].x0, opts.marker ? opts.marker.value : Infinity);
+  const hi = Math.max(bins[bins.length - 1].x1, opts.marker ? opts.marker.value : -Infinity);
+  const pad = (hi - lo) * 0.04;
+  const x = d3.scaleLinear().domain([lo - pad, hi + pad]).range([0, innerW]);
+  const y = d3.scaleLinear().domain([0, d3.max(bins, (b) => b.count)]).nice().range([innerH, 0]);
+
+  g.append("g").attr("class", "axis").attr("transform", `translate(0,${innerH})`).call(d3.axisBottom(x).ticks(Math.max(4, Math.floor(innerW / 80))));
+  g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(6));
+  g.append("text")
+    .attr("x", innerW / 2).attr("y", innerH + 38).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text(opts.xLabel || "");
+  g.append("text")
+    .attr("transform", "rotate(-90)").attr("x", -innerH / 2).attr("y", -40).attr("text-anchor", "middle")
+    .attr("fill", "var(--text-dim)").style("font-size", "0.8rem")
+    .text(opts.yLabel || "");
+
+  const label = opts.binLabel || ((b) => `${b.count} in [${d3.format(".3~f")(b.x0)}, ${d3.format(".3~f")(b.x1)})`);
+  g.selectAll("rect.bar")
+    .data(bins)
+    .join("rect")
+    .attr("class", "bar")
+    .attr("x", (b) => x(b.x0) + 0.5)
+    .attr("width", (b) => Math.max(1, x(b.x1) - x(b.x0) - 1))
+    .attr("y", (b) => y(b.count))
+    .attr("height", (b) => innerH - y(b.count))
+    .attr("tabindex", "0")
+    .attr("role", "img")
+    .attr("aria-label", label)
+    .call(bindTip, label, { onShow: (event, b) => opts.onHover && opts.onHover(b) });
+
+  if (opts.marker) {
+    const mx = x(opts.marker.value);
+    g.append("line")
+      .attr("x1", mx).attr("x2", mx).attr("y1", 0).attr("y2", innerH)
+      .attr("stroke", "var(--accent)").attr("stroke-width", 2.5).attr("pointer-events", "none");
+    const right = mx < innerW * 0.7;
+    g.append("text")
+      .attr("x", mx + (right ? 6 : -6)).attr("y", 12).attr("text-anchor", right ? "start" : "end")
+      .attr("fill", "var(--accent)").style("font-size", "0.8rem").attr("pointer-events", "none")
+      .attr("stroke", "var(--panel)").attr("stroke-width", 4).attr("paint-order", "stroke") // halo over bars
+      .text(opts.marker.label);
+  }
 }
 
 export function renderDensityGrid(container, density, totalCells = 100) {

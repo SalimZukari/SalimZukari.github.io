@@ -1,5 +1,6 @@
 // Interactive force-directed network graph (D3 force simulation).
 /* global d3 */
+import { bindTip } from "./tooltip.js";
 
 const COMPONENT_PALETTE = [
   "#37e6ff", "#ff3d68", "#ffd23f", "#8c6bff", "#4ade80",
@@ -82,13 +83,19 @@ export function createNetworkGraph(svgEl, { nodes, edges }, callbacks = {}) {
       .select("title")
       .text((d) => `${d.name} — degree ${d.undirectedDegree} (in ${d.inDegree} / out ${d.outDegree})`);
 
+    // The <title> above stays as a no-JS / assistive-tech fallback, but browsers
+    // delay native tooltips and suppress them on moving elements, and the
+    // simulation moves every node each tick, so the real label is the shared
+    // tooltip: instant on hover, keyboard focus and tap.
     nodeSel
-      .on("mouseenter focus", (event, d) => {
-        callbacks.onHover && callbacks.onHover(d);
-        applyHighlight(d.id);
-      })
-      .on("mouseleave", () => {
-        if (!selectedId) applyHighlight(null);
+      .call(bindTip, (d) => `<strong>${d.name}</strong><br>degree ${d.undirectedDegree} (in ${d.inDegree} / out ${d.outDegree})`, {
+        onShow: (event, d) => {
+          callbacks.onHover && callbacks.onHover(d);
+          applyHighlight(d.id);
+        },
+        onHide: () => {
+          if (!selectedId) applyHighlight(null);
+        },
       })
       .on("click", (event, d) => {
         selectedId = d.id;

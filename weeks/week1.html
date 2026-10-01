@@ -144,11 +144,12 @@
             Each point is one Marvel character. <strong>High in-degree</strong> means many other pages link to this
             character; <strong>high out-degree</strong> means this character's own page links out to many others.
             The dashed line marks where in-degree equals out-degree — points far from it are the interesting outliers.
-            Scroll/pinch to zoom, drag to pan, hover for details.
+            Scroll/pinch to zoom, drag to pan, hover or tap a dot for details.
           </p>
           <div class="chart-wrap">
             <div id="scatter-chart" style="min-height:460px"></div>
           </div>
+          <p class="w4-readout" id="scatter-readout" aria-live="polite">Hover, tap or Tab to a dot to see who it is. Click it to open their profile.</p>
           <details class="chart-summary">
             <summary>Text summary of this chart</summary>
             <div class="explainer-body" id="scatter-text-summary"></div>
@@ -193,6 +194,7 @@
               <svg id="network-svg" role="img" aria-label="Force-directed graph of the Marvel character network"></svg>
             </div>
           </div>
+          <p class="w4-readout" id="network-readout" aria-live="polite">Hover, tap or Tab to a node to see who it is. Click it to highlight its neighbors and open their profile.</p>
           <p class="chart-caption" style="margin-top:10px">
             <span class="legend-chip"><span class="legend-swatch" style="background:#37e6ff"></span>Largest component</span>
             <span class="legend-chip"><span class="legend-swatch" style="background:#8c6bff"></span>Other components</span>

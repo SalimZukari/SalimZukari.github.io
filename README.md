@@ -67,10 +67,13 @@ articulation points) with NetworkX: node/edge counts, degree rankings and distri
 connected components, articulation points, sanity checks (`Σin-degree = m`,
 `Σdegree = 2m`, `density = m / max edges`, etc.), and auto-generated "Aha!" findings.
 
-**Week 2** is a static write-up (`weeks/week2/week2_gonuts.md` + `week2_gonuts.ipynb`):
-the friendship paradox on the Marvel giant component, checked against a 500-run
-degree-preserving null model. Its figures and numbers are baked into `weeks/week2.html`
-from that notebook's output, in the same style as a blog post.
+**Week 2 — `scripts/week2_analyze.py` → `data/processed/week2.json`.** The friendship paradox
+on the Marvel giant component: degree CCDFs for BA(5000), Marvel and their G(n, m) controls,
+1,000 sampled (person, friend) pairs per network, each character's "out-popularity'd rate",
+and a 500-run degree-preserving null model. A straight port of `weeks/week2/week2_gonuts.ipynb`
+(seed 2026, same sampling order), so it reproduces the notebook's numbers exactly; histogram
+bins come from `np.histogram`, the same binning the notebook's figures used. Takes about
+1.5 minutes. The write-up is `weeks/week2/week2_gonuts.md`.
 
 **Week 3 — `scripts/week3_analyze.py` → `data/processed/week3.json`.** Centralities
 (degree, closeness, harmonic, betweenness, PageRank) against a 200-run degree-preserving
@@ -114,6 +117,7 @@ Requirements: Python 3 with `pandas`, `networkx` (≥ 3.4, for `forceatlas2_layo
 ```bash
 # 1. Regenerate the analyses from the raw dataset
 npm run analyze          # Week 1 -> data/processed/analysis.json
+npm run analyze:week2    # Week 2 -> data/processed/week2.json
 npm run analyze:week3    # Week 3 -> data/processed/week3.json + weeks/week3/figures/
 npm run analyze:week4    # Week 4 -> data/processed/week4.json + weeks/week4/figures/
 npm run validate:week4   # Week 4 in-browser computations vs the Python output
@@ -140,7 +144,7 @@ weeks/
   week3.html                  # Week 3 — Who Holds the Marvel Universe Together?
   week4.html                  # Week 4 — Solid Cores, Moving Borders (philosophers)
   week5.html                  # Week 5 — Fame Buys Length, Not New Words (Marvel pages as text)
-  week2/                      # week2_gonuts.ipynb, week2_gonuts.md, figures/*.png
+  week2/                      # week2_gonuts.ipynb, week2_gonuts.md, figures/*.png (original static figures)
   week3/                      # week3_gonuts.ipynb, week3_gonuts.md, figures/*.png
   week4/                      # week4_gonuts.ipynb, week4_gonuts.md, figures/*.png
   week5/                      # week5_gonuts.ipynb, week5_gonuts.md, figures/*.png
@@ -148,15 +152,18 @@ week2.html                    # redirect stub -> weeks/week2.html (old links)
 src/css/styles.css            # shared dark/comic visual design system
 src/js/
   weeks.js                    # the week manifest — the only place a week is registered
+  tooltip.js                  # shared tooltip + readout helpers used by every chart (hover, focus, tap)
   hub.js                      # renders the hub's card grid from weeks.js
   weeknav.js                  # shared chrome on every week page (hub link, switcher, prev/next)
   data.js, main.js, charts.js, network.js, hero.js, experiments.js   # Week 1 dashboard
+  week2.js                    # Week 2 page
   week3.js                    # Week 3 page
   week4.js, week4_core.js     # Week 4 page; week4_core.js = pure computations shared with the Node validator
   week5.js, week5_core.js     # Week 5 page; week5_core.js = power-law fit + Bag-of-Words ranking, shared with the Node validator
 data/raw/                     # frozen course snapshots (Marvel weeks 1 + 4 + 5, philosophers week 4) + Wikidata caches
-data/processed/               # analysis.json (Week 1), week3.json (Week 3), week4.json (Week 4), week5.json + week5_search.json (Week 5)
+data/processed/               # analysis.json (Week 1), week2.json (Week 2), week3.json (Week 3), week4.json (Week 4), week5.json + week5_search.json (Week 5)
 scripts/analyze.py            # Week 1 pipeline ("npm run analyze")
+scripts/week2_analyze.py      # Week 2 pipeline ("npm run analyze:week2")
 scripts/week3_analyze.py      # Week 3 pipeline ("npm run analyze:week3")
 scripts/week4_analyze.py      # Week 4 pipeline ("npm run analyze:week4")
 scripts/netlib.py             # shared loaders, nulls, NMI, modularity, partition helpers
@@ -175,6 +182,10 @@ scripts/week5_validate_browser.mjs   # "npm run validate:week5"
    `../src/js/weeknav.js` at the bottom of the page for the shared chrome.
 3. If the week needs its own computed data, add `scripts/weekN_analyze.py` writing
    `data/processed/weekN.json`, and an `analyze:weekN` script in `package.json`.
+4. For interactive marks, bind `bindTip` from `src/js/tooltip.js` (hover, keyboard focus and
+   touch in one call) and put a `<p class="w4-readout" aria-live="polite">` under the chart
+   that keeps the last selection — hover alone never fires on a phone. Give marks smaller than
+   ~10px an invisible hit area (see `addHitDots` in `charts.js`).
 
 ## GitHub Pages
 

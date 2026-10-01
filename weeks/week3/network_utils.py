@@ -11,8 +11,9 @@ import random
 
 # Resolve data files relative to this module's own location (not the
 # caller's working directory), so scripts in other week-2 subfolders
-# (e.g. 2.8/) can import this module and still find the data.
-_DATA_DIR = os.path.dirname(os.path.abspath(__file__))
+# (e.g. 2.8/) can import this module and still find the data. The one copy
+# of the dataset lives in the repo's data/raw/.
+_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "raw")
 EDGES_FILE = os.path.join(_DATA_DIR, "week1_edges.tsv")
 NODES_FILE = os.path.join(_DATA_DIR, "week1_nodes.tsv")
 

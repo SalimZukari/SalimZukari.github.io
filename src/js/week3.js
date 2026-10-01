@@ -4,6 +4,7 @@
 // neighbors, already generated once and reused rather than duplicated).
 import { loadData, getNode, allNodes, searchNodes, fmt } from "./data.js";
 import { renderZScoreScatter, renderRemovalChart } from "./charts.js";
+import { setReadout } from "./tooltip.js";
 
 const WEEK3_URL = new URL("../../data/processed/week3.json", import.meta.url);
 
@@ -106,13 +107,17 @@ function renderBrokers(w3) {
   }));
   const labelIds = [...w3.brokers.topPositiveZBetweenness.slice(0, 6), ...w3.brokers.topNegativeZBetweenness.slice(0, 3)];
   const pinned = document.getElementById("brokers-pinned");
+  // the pinned readout shows the last point hovered, focused or tapped, and
+  // stays there after the pointer leaves
+  const pin = (d) => {
+    const zClass = d.z >= 0 ? "z-pos" : "z-neg";
+    setReadout(pinned, `<strong>${d.name}</strong> — degree ${d.degree}, betweenness z-score <span class="${zClass}">${d.z >= 0 ? "+" : ""}${d.z.toFixed(2)}</span>`);
+  };
   renderZScoreScatter(document.getElementById("brokers-chart"), points, {
     label: "betweenness",
     labelIds,
-    onSelect: (d) => {
-      const zClass = d.z >= 0 ? "z-pos" : "z-neg";
-      pinned.innerHTML = `<strong>${d.name}</strong> — degree ${d.degree}, betweenness z-score <span class="${zClass}">${d.z >= 0 ? "+" : ""}${d.z.toFixed(2)}</span>`;
-    },
+    onHover: pin,
+    onSelect: pin,
   });
 
   const rows = w3.brokers.topPositiveZBetweenness

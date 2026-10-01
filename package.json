@@ -5,6 +5,7 @@
   "description": "Social Graphs and Interactions (DTU 02805) — group course site: a week hub with one interactive post per week, mostly on the shared Marvel Wikipedia character network.",
   "scripts": {
     "analyze": "python scripts/analyze.py",
+    "analyze:week2": "python scripts/week2_analyze.py",
     "analyze:week3": "python scripts/week3_analyze.py",
     "analyze:week4": "python scripts/week4_analyze.py",
     "validate:week4": "node scripts/week4_validate_browser.mjs",

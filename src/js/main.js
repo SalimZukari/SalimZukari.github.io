@@ -1,6 +1,7 @@
 import { loadData, allNodes, getNode, searchNodes, fmt, interpretCharacter } from "./data.js";
 import { renderDegreeDistribution, renderScatter, renderComponentBars, renderDensityGrid } from "./charts.js";
 import { createNetworkGraph } from "./network.js";
+import { setReadout } from "./tooltip.js";
 import { initHeroNetwork } from "./hero.js";
 import { setupWhoRules, setupDeleteHero, setupPathFinder, setupGuessDegree } from "./experiments.js";
 
@@ -247,8 +248,12 @@ function setupScatter(data, profile) {
     `${nodes.length} characters plotted by in-degree vs out-degree. The most extreme mismatch belongs to ${mismatch.name}, ` +
     `with in-degree ${mismatch.inDegree} and out-degree ${mismatch.outDegree}.`;
 
+  const readout = document.getElementById("scatter-readout");
   function render() {
-    renderScatter(chartEl, nodes, { onClick: (d) => profile.show(d) });
+    renderScatter(chartEl, nodes, {
+      onHover: (d) => setReadout(readout, `<strong>${d.name}</strong>: in-degree ${d.inDegree}, out-degree ${d.outDegree}.`),
+      onClick: (d) => profile.show(d),
+    });
   }
   render();
   window.addEventListener("resize", debounce(render, 200));
@@ -258,7 +263,10 @@ function setupScatter(data, profile) {
 
 function setupNetworkGraph(data, profile) {
   const svg = document.getElementById("network-svg");
+  const readout = document.getElementById("network-readout");
   const graph = createNetworkGraph(svg, { nodes: allNodes(), edges: data.edges }, {
+    onHover: (d) =>
+      setReadout(readout, `<strong>${d.name}</strong>: degree ${d.undirectedDegree} (in ${d.inDegree} / out ${d.outDegree}).`),
     onSelect: (node) => profile.show(node),
   });
   return graph;

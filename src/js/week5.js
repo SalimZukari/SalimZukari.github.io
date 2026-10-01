@@ -195,6 +195,10 @@ function renderHook() {
     // dots: a little horizontal jitter, fixed per page, so equal in-degrees don't stack
     const jit = (i) => (P.inDeg[i] < 3 ? (((i * 37) % 17) / 17 - 0.5) * 0.22 : 0);
     const pts = P.id.map((_, i) => i).sort((a, b) => (group.has(a) ? 1 : 0) - (group.has(b) ? 1 : 0));
+    // r=3.2 dots are too small for a finger: transparent r=11 hit circles underneath
+    svg.append("g").selectAll("circle").data(pts).join("circle").attr("class", "hit-dot")
+      .attr("cx", (i) => x(P.inDeg[i] + jit(i))).attr("cy", (i) => y(P.tokens[i])).attr("r", 11)
+      .on("pointerenter click", (_, i) => pin(i));
     svg.append("g").selectAll("circle").data(pts).join("circle").attr("class", "pt")
       .attr("cx", (i) => x(P.inDeg[i] + jit(i))).attr("cy", (i) => y(P.tokens[i]))
       .attr("r", (i) => (group.has(i) ? 5 : 3.2)).attr("fill", color).attr("fill-opacity", (i) => (group.has(i) ? 1 : 0.6))
